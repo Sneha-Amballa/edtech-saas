@@ -1,0 +1,128 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Page Container */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f8fafc, #e0e7ff);
+  font-family: "Inter", sans-serif;
+}
+
+/* Card */
+.login-card {
+  background: #ffffff;
+  width: 360px;
+  padding: 40px 32px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+/* Logo */
+.login-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.logo-icon {
+  font-size: 32px;
+  color: #6366f1;
+}
+
+.login-logo h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.login-logo span {
+  color: #6366f1;
+}
+
+/* Subtitle */
+.login-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 32px;
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Input Group */
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Button */
+.login-btn {
+  margin-top: 12px;
+  padding: 12px;
+  background: #6366f1;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-items: center;
+}
+
+.login-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+}
+
+/* Bottom Text */
+.login-text {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.login-text a {
+  color: #6366f1;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-text a:hover {
+  text-decoration: underline;
+}

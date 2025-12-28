@@ -1,0 +1,138 @@
+/* GLOBAL FIX */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Page Container */
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f8fafc, #e0e7ff);
+  font-family: "Inter", sans-serif;
+}
+
+/* Card */
+.register-card {
+  background: #ffffff;
+  width: 380px;
+  padding: 40px 32px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+/* Logo */
+.register-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.logo-icon {
+  font-size: 32px;
+  color: #6366f1;
+}
+
+.register-logo h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.register-logo span {
+  color: #6366f1;
+}
+
+/* Subtitle */
+.register-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 32px;
+}
+
+/* Form */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Input Group */
+.input-group {
+  position: relative;
+  width: 100%;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.input-group select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* Button */
+.register-btn {
+  margin-top: 12px;
+  padding: 12px;
+  background: #6366f1;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.register-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+}
+
+/* Bottom Text */
+.register-text {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.register-text a {
+  color: #6366f1;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-text a:hover {
+  text-decoration: underline;
+}
