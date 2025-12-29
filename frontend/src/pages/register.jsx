@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   FaGraduationCap,
   FaUser,
@@ -6,10 +7,41 @@ import {
   FaLock,
   FaUserTie,
 } from "react-icons/fa";
-
+import { registerUser } from "../services/authService";
 import "../styles/register.css";
 
 const Register = () => {
+  const navigate = useNavigate();
+
+  // 1️⃣ Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "",
+  });
+
+  // 2️⃣ Handle input changes
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // 3️⃣ Handle submit
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // stop page refresh
+
+    try {
+      await registerUser(formData);
+      alert("Registration successful! Please login.");
+      navigate("/login");
+    } catch (error) {
+      alert(error.response?.data?.message || "Registration failed");
+    }
+  };
+
   return (
     <div className="register-container">
       <div className="register-card">
@@ -26,25 +58,52 @@ const Register = () => {
           Create your account and start learning
         </p>
 
-        <form className="register-form">
+        <form className="register-form" onSubmit={handleSubmit}>
+
           <div className="input-group">
             <FaUser className="input-icon" />
-            <input type="text" placeholder="Full name" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Full name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
           </div>
 
           <div className="input-group">
             <FaEnvelope className="input-icon" />
-            <input type="email" placeholder="Email address" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email address"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
           </div>
 
           <div className="input-group">
             <FaLock className="input-icon" />
-            <input type="password" placeholder="Password" />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
           </div>
 
           <div className="input-group">
             <FaUserTie className="input-icon" />
-            <select>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
               <option value="">Select role</option>
               <option value="student">Student</option>
               <option value="mentor">Mentor</option>
@@ -60,6 +119,7 @@ const Register = () => {
           Already have an account?{" "}
           <Link to="/login">Login</Link>
         </p>
+
       </div>
     </div>
   );
