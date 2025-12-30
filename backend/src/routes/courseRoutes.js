@@ -6,20 +6,23 @@ const cloudinary = require("../cloudinary");
 
 const router = express.Router();
 
-/* 🔐 AUTH */
+/* ================= AUTH ================= */
 const auth = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "No token" });
 
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = {
+      id: decoded._id,
+      role: decoded.role,
+    };
     next();
   } catch {
-    res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
 
-/* 🎭 ROLE */
 const mentorOnly = (req, res, next) => {
   if (req.user.role !== "mentor") {
     return res.status(403).json({ message: "Mentor access only" });
@@ -27,59 +30,136 @@ const mentorOnly = (req, res, next) => {
   next();
 };
 
-/* 📦 MULTER */
+/* ================= MULTER ================= */
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 200 * 1024 * 1024 }, // 200MB for videos
+  limits: { fileSize: 200 * 1024 * 1024 }, // 200MB
 });
 
-/* 🌍 Public – published courses */
+/* =========================================================
+   PUBLIC ROUTES
+========================================================= */
+
+/* 🌍 Get all published courses */
 router.get("/", async (req, res) => {
-  const courses = await Course.find({ published: true }).populate("mentor", "name");
-  res.json(courses);
+  try {
+    const courses = await Course.find({ published: true })
+      .populate("mentor", "name");
+    res.json(courses);
+  } catch {
+    res.status(500).json({ message: "Failed to fetch courses" });
+  }
 });
+
+/* 👀 Student – public course */
+router.get("/:id/public", async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id)
+      .populate("mentor", "name");
+
+    if (!course || !course.published) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    const lessons = course.lessons
+      .filter(l => l.type === "text" || l.type === "video") // 🚫 block old pdf
+      .map(l => ({
+        _id: l._id,
+        title: l.title,
+        type: l.type,
+        isFree: l.isFree,
+        content: l.isFree ? l.content : null,
+      }));
+
+    res.json({
+      _id: course._id,
+      title: course.title,
+      description: course.description,
+      price: course.price,
+      mentor: course.mentor,
+      lessons,
+    });
+  } catch {
+    res.status(500).json({ message: "Failed to load course" });
+  }
+});
+
+/* =========================================================
+   MENTOR ROUTES
+========================================================= */
 
 /* 👨‍🏫 Mentor – own courses */
 router.get("/my", auth, mentorOnly, async (req, res) => {
-  const courses = await Course.find({ mentor: req.user.id });
-  res.json(courses);
+  try {
+    const courses = await Course.find({ mentor: req.user.id });
+    res.json(courses);
+  } catch {
+    res.status(500).json({ message: "Failed to fetch courses" });
+  }
 });
 
-/* 🔎 Mentor – get single course */
-router.get("/:id", auth, mentorOnly, async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  if (!course) return res.status(404).json({ message: "Course not found" });
-  if (course.mentor.toString() !== req.user.id)
-    return res.status(403).json({ message: "Not your course" });
+/* 🔧 Mentor – manage course */
+router.get("/:id/manage", auth, mentorOnly, async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course || !course.mentor) {
+      return res.status(404).json({ message: "Course not found" });
+    }
 
-  res.json(course);
+    if (String(course.mentor) !== req.user.id) {
+      return res.status(403).json({ message: "Not your course" });
+    }
+
+    // Remove any legacy pdf lessons safely
+    course.lessons = course.lessons.filter(
+      l => l.type === "text" || l.type === "video"
+    );
+
+    res.json(course);
+  } catch {
+    res.status(500).json({ message: "Failed to load course" });
+  }
 });
 
 /* ➕ Create course */
 router.post("/", auth, mentorOnly, async (req, res) => {
-  const course = await Course.create({
-    title: req.body.title,
-    description: req.body.description,
-    price: req.body.price,
-    mentor: req.user.id,
-    published: false,
-  });
-  res.status(201).json(course);
+  try {
+    const course = await Course.create({
+      title: req.body.title,
+      description: req.body.description,
+      price: req.body.price,
+      mentor: req.user.id,
+      published: false,
+    });
+
+    res.status(201).json(course);
+  } catch {
+    res.status(500).json({ message: "Course creation failed" });
+  }
 });
 
-/* 🚀 Publish */
+/* 🚀 Publish course */
 router.patch("/:id/publish", auth, mentorOnly, async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  if (!course) return res.status(404).json({ message: "Course not found" });
-  if (course.mentor.toString() !== req.user.id)
-    return res.status(403).json({ message: "Not your course" });
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course || !course.mentor) {
+      return res.status(404).json({ message: "Course not found" });
+    }
 
-  course.published = true;
-  await course.save();
-  res.json({ message: "Published" });
+    if (String(course.mentor) !== req.user.id) {
+      return res.status(403).json({ message: "Not your course" });
+    }
+
+    course.published = true;
+    await course.save();
+
+    res.json({ message: "Course published" });
+  } catch {
+    res.status(500).json({ message: "Publish failed" });
+  }
 });
 
-/* 📚 ADD LESSON (TEXT / VIDEO ONLY) */
+/* 📚 ADD LESSON — TEXT / VIDEO ONLY */
 router.post(
   "/:id/lessons",
   auth,
@@ -89,10 +169,16 @@ router.post(
     try {
       const { title, type, textContent, isFree } = req.body;
 
-      const course = await Course.findById(req.params.id);
-      if (!course) return res.status(404).json({ message: "Course not found" });
+      if (!["text", "video"].includes(type)) {
+        return res.status(400).json({ message: "Invalid lesson type" });
+      }
 
-      if (course.mentor.toString() !== req.user.id) {
+      const course = await Course.findById(req.params.id);
+      if (!course || !course.mentor) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+
+      if (String(course.mentor) !== req.user.id) {
         return res.status(403).json({ message: "Not your course" });
       }
 
@@ -104,6 +190,7 @@ router.post(
           content: textContent,
           isFree: isFree === "true",
         });
+
         await course.save();
         return res.status(201).json(course.lessons);
       }
@@ -115,8 +202,10 @@ router.post(
             resource_type: "video",
             folder: `courses/${course._id}`,
           },
-          async (error, result) => {
-            if (error) return res.status(500).json({ message: "Upload failed" });
+          async (err, result) => {
+            if (err) {
+              return res.status(500).json({ message: "Video upload failed" });
+            }
 
             course.lessons.push({
               title,
@@ -135,9 +224,8 @@ router.post(
       }
 
       res.status(400).json({ message: "Invalid lesson data" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Failed to add lesson" });
+    } catch {
+      res.status(500).json({ message: "Lesson creation failed" });
     }
   }
 );

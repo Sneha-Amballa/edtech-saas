@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ManageCourse from "./pages/ManageCourse";
-
+import CourseDetails from "./pages/CourseDetails";
 import StudentDashboard from "./pages/StudentDashboard";
 import MentorDashboard from "./pages/MentorDashboard";
 import CreateCourse from "./pages/CreateCourse";
@@ -24,7 +24,7 @@ function App() {
         <Route path="/courses" element={<Courses />} />
         <Route path="/mentor/course/:id" element={<ManageCourse />} />
         <Route path="/mentor/course/:id" element={<ManageCourse />} />
-
+        <Route path="/course/:id" element={<CourseDetails />} />
       </Routes>
     </BrowserRouter>
   );

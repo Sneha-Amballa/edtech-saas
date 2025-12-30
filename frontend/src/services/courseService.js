@@ -4,57 +4,52 @@ const API = "http://localhost:5000/courses";
 
 const getToken = () => localStorage.getItem("token");
 
-/* 🌍 Public – student browse */
+/* 🌍 Student – browse courses */
 export const getPublishedCourses = () => {
   return axios.get(API);
+};
+
+/* 🌍 Student – course details */
+export const getPublicCourseById = (courseId) => {
+  return axios.get(`${API}/${courseId}/public`);
 };
 
 /* 👨‍🏫 Mentor – create course */
 export const createCourse = (courseData) => {
   return axios.post(API, courseData, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
+    headers: { Authorization: `Bearer ${getToken()}` },
   });
 };
 
-/* 👨‍🏫 Mentor – get own courses */
+/* 👨‍🏫 Mentor – own courses */
 export const getMyCourses = () => {
   return axios.get(`${API}/my`, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
+    headers: { Authorization: `Bearer ${getToken()}` },
   });
 };
 
-/* 👨‍🏫 Mentor – publish course */
-export const publishCourse = (courseId) => {
-  return axios.patch(
-    `${API}/${courseId}/publish`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }
-  );
-};
-
-/* 👨‍🏫 Mentor – get course by ID (manage page) */
-export const getCourseById = (courseId) => {
-  return axios.get(`${API}/${courseId}`, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
+/* 👨‍🏫 Mentor – manage course */
+export const getCourseById = (id) => {
+  return axios.get(`${API}/${id}/manage`, {
+    headers: { Authorization: `Bearer ${getToken()}` },
   });
 };
 
 /* 👨‍🏫 Mentor – add lesson (TEXT / VIDEO ONLY) */
-export const addLesson = (courseId, formData) => {
-  return axios.post(`${API}/${courseId}/lessons`, formData, {
+export const addLesson = (id, data) => {
+  return axios.post(`${API}/${id}/lessons`, data, {
     headers: {
       Authorization: `Bearer ${getToken()}`,
       "Content-Type": "multipart/form-data",
     },
   });
+};
+
+/* 👨‍🏫 Mentor – publish */
+export const publishCourse = (id) => {
+  return axios.patch(
+    `${API}/${id}/publish`,
+    {},
+    { headers: { Authorization: `Bearer ${getToken()}` } }
+  );
 };

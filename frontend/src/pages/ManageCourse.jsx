@@ -479,4 +479,4 @@ const ManageCourse = () => {
   );
 };
 
-export default ManageCourse;
+export default ManageCourse; 
