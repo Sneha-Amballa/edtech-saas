@@ -4,12 +4,12 @@ const API = "http://localhost:5000/courses";
 
 const getToken = () => localStorage.getItem("token");
 
-/* 🔓 Public – get all published courses */
+/* 🌍 Public – student browse */
 export const getPublishedCourses = () => {
   return axios.get(API);
 };
 
-/* 🔐 Mentor – create course */
+/* 👨‍🏫 Mentor – create course */
 export const createCourse = (courseData) => {
   return axios.post(API, courseData, {
     headers: {
@@ -18,7 +18,7 @@ export const createCourse = (courseData) => {
   });
 };
 
-/* 🔐 Mentor – get own courses */
+/* 👨‍🏫 Mentor – get own courses */
 export const getMyCourses = () => {
   return axios.get(`${API}/my`, {
     headers: {
@@ -27,7 +27,7 @@ export const getMyCourses = () => {
   });
 };
 
-/* 🔐 Mentor – publish/unpublish (future use) */
+/* 👨‍🏫 Mentor – publish course */
 export const publishCourse = (courseId) => {
   return axios.patch(
     `${API}/${courseId}/publish`,
@@ -38,4 +38,23 @@ export const publishCourse = (courseId) => {
       },
     }
   );
+};
+
+/* 👨‍🏫 Mentor – get course by ID (manage page) */
+export const getCourseById = (courseId) => {
+  return axios.get(`${API}/${courseId}`, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+};
+
+/* 👨‍🏫 Mentor – add lesson (TEXT / VIDEO ONLY) */
+export const addLesson = (courseId, formData) => {
+  return axios.post(`${API}/${courseId}/lessons`, formData, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };

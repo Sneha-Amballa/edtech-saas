@@ -23,6 +23,8 @@ function App() {
         <Route path="/mentor/create-course" element={<CreateCourse />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/mentor/course/:id" element={<ManageCourse />} />
+        <Route path="/mentor/course/:id" element={<ManageCourse />} />
+
       </Routes>
     </BrowserRouter>
   );

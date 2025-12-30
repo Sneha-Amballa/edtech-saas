@@ -1,12 +1,19 @@
 const mongoose = require("mongoose");
 
 const lessonSchema = new mongoose.Schema({
-  title: String,
+  title: {
+    type: String,
+    required: true,
+  },
   type: {
     type: String,
-    enum: ["video", "pdf", "text"],
+    enum: ["text", "video"], // ❌ pdf removed
+    required: true,
   },
-  content: String, // URL (video/pdf) or text content
+  content: {
+    type: String, // text OR video URL
+    required: true,
+  },
   isFree: {
     type: Boolean,
     default: false,
@@ -21,10 +28,6 @@ const courseSchema = new mongoose.Schema(
     mentor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    },
-    overview: {
-      whatYouWillLearn: [String],
-      requirements: [String],
     },
     lessons: [lessonSchema],
     published: {

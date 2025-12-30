@@ -27,56 +27,59 @@ const mentorOnly = (req, res, next) => {
   next();
 };
 
-/* 📦 MULTER (MEMORY) */
+/* 📦 MULTER */
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+  limits: { fileSize: 200 * 1024 * 1024 }, // 200MB for videos
 });
 
-/* ---------------- ROUTES ---------------- */
-
-// Public – published courses
+/* 🌍 Public – published courses */
 router.get("/", async (req, res) => {
   const courses = await Course.find({ published: true }).populate("mentor", "name");
   res.json(courses);
 });
 
-// Mentor – create course
-router.post("/", auth, mentorOnly, async (req, res) => {
-  const { title, description, price } = req.body;
-
-  const course = await Course.create({
-    title,
-    description,
-    price,
-    mentor: req.user.id,
-  });
-
-  res.status(201).json(course);
-});
-
-// Mentor – get own courses
+/* 👨‍🏫 Mentor – own courses */
 router.get("/my", auth, mentorOnly, async (req, res) => {
   const courses = await Course.find({ mentor: req.user.id });
   res.json(courses);
 });
 
-// Mentor – publish course
+/* 🔎 Mentor – get single course */
+router.get("/:id", auth, mentorOnly, async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) return res.status(404).json({ message: "Course not found" });
+  if (course.mentor.toString() !== req.user.id)
+    return res.status(403).json({ message: "Not your course" });
+
+  res.json(course);
+});
+
+/* ➕ Create course */
+router.post("/", auth, mentorOnly, async (req, res) => {
+  const course = await Course.create({
+    title: req.body.title,
+    description: req.body.description,
+    price: req.body.price,
+    mentor: req.user.id,
+    published: false,
+  });
+  res.status(201).json(course);
+});
+
+/* 🚀 Publish */
 router.patch("/:id/publish", auth, mentorOnly, async (req, res) => {
   const course = await Course.findById(req.params.id);
   if (!course) return res.status(404).json({ message: "Course not found" });
-
-  if (course.mentor.toString() !== req.user.id) {
+  if (course.mentor.toString() !== req.user.id)
     return res.status(403).json({ message: "Not your course" });
-  }
 
   course.published = true;
   await course.save();
-
-  res.json({ message: "Course published successfully" });
+  res.json({ message: "Published" });
 });
 
-// 🔥 ADD LESSON (TEXT / VIDEO / PDF)
+/* 📚 ADD LESSON (TEXT / VIDEO ONLY) */
 router.post(
   "/:id/lessons",
   auth,
@@ -93,26 +96,27 @@ router.post(
         return res.status(403).json({ message: "Not your course" });
       }
 
-      let content = "";
-
-      // TEXT lesson
+      /* TEXT */
       if (type === "text") {
-        content = textContent;
+        course.lessons.push({
+          title,
+          type,
+          content: textContent,
+          isFree: isFree === "true",
+        });
+        await course.save();
+        return res.status(201).json(course.lessons);
       }
 
-      // VIDEO or PDF
-      if (type === "video" || type === "pdf") {
-        if (!req.file) {
-          return res.status(400).json({ message: "File required" });
-        }
-
-        const uploadResult = await cloudinary.uploader.upload_stream(
+      /* VIDEO */
+      if (type === "video" && req.file) {
+        const uploadStream = cloudinary.uploader.upload_stream(
           {
-            resource_type: type === "video" ? "video" : "raw",
+            resource_type: "video",
             folder: `courses/${course._id}`,
           },
           async (error, result) => {
-            if (error) throw error;
+            if (error) return res.status(500).json({ message: "Upload failed" });
 
             course.lessons.push({
               title,
@@ -122,35 +126,17 @@ router.post(
             });
 
             await course.save();
-
-            res.status(201).json({
-              message: "Lesson added successfully",
-              lessons: course.lessons,
-            });
+            res.status(201).json(course.lessons);
           }
         );
 
-        uploadResult.end(req.file.buffer);
+        uploadStream.end(req.file.buffer);
         return;
       }
 
-      // Save TEXT lesson
-      course.lessons.push({
-        title,
-        type,
-        content,
-        isFree: isFree === "true",
-      });
-
-      await course.save();
-
-      res.status(201).json({
-        message: "Lesson added successfully",
-        lessons: course.lessons,
-      });
-
+      res.status(400).json({ message: "Invalid lesson data" });
     } catch (err) {
-      console.error("UPLOAD ERROR:", err);
+      console.error(err);
       res.status(500).json({ message: "Failed to add lesson" });
     }
   }
