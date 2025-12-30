@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ManageCourse from "./pages/ManageCourse";
 
 import StudentDashboard from "./pages/StudentDashboard";
 import MentorDashboard from "./pages/MentorDashboard";
@@ -21,6 +22,7 @@ function App() {
         <Route path="/mentor" element={<MentorDashboard />} />
         <Route path="/mentor/create-course" element={<CreateCourse />} />
         <Route path="/courses" element={<Courses />} />
+        <Route path="/mentor/course/:id" element={<ManageCourse />} />
       </Routes>
     </BrowserRouter>
   );

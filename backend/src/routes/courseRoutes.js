@@ -1,10 +1,12 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
 const Course = require("../models/Course");
+const cloudinary = require("../cloudinary");
 
 const router = express.Router();
 
-/* 🔐 SIMPLE AUTH CHECK */
+/* 🔐 AUTH */
 const auth = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "No token" });
@@ -17,7 +19,7 @@ const auth = (req, res, next) => {
   }
 };
 
-/* 🎭 ROLE CHECK */
+/* 🎭 ROLE */
 const mentorOnly = (req, res, next) => {
   if (req.user.role !== "mentor") {
     return res.status(403).json({ message: "Mentor access only" });
@@ -25,14 +27,17 @@ const mentorOnly = (req, res, next) => {
   next();
 };
 
-/* 📌 ROUTES */
+/* 📦 MULTER (MEMORY) */
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+});
 
-// Public – get published courses
+/* ---------------- ROUTES ---------------- */
+
+// Public – published courses
 router.get("/", async (req, res) => {
-  const courses = await Course.find({ published: true }).populate(
-    "mentor",
-    "name"
-  );
+  const courses = await Course.find({ published: true }).populate("mentor", "name");
   res.json(courses);
 });
 
@@ -56,17 +61,11 @@ router.get("/my", auth, mentorOnly, async (req, res) => {
   res.json(courses);
 });
 
-module.exports = router;
-
 // Mentor – publish course
 router.patch("/:id/publish", auth, mentorOnly, async (req, res) => {
   const course = await Course.findById(req.params.id);
+  if (!course) return res.status(404).json({ message: "Course not found" });
 
-  if (!course) {
-    return res.status(404).json({ message: "Course not found" });
-  }
-
-  // Ensure mentor owns the course
   if (course.mentor.toString() !== req.user.id) {
     return res.status(403).json({ message: "Not your course" });
   }
@@ -76,3 +75,85 @@ router.patch("/:id/publish", auth, mentorOnly, async (req, res) => {
 
   res.json({ message: "Course published successfully" });
 });
+
+// 🔥 ADD LESSON (TEXT / VIDEO / PDF)
+router.post(
+  "/:id/lessons",
+  auth,
+  mentorOnly,
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      const { title, type, textContent, isFree } = req.body;
+
+      const course = await Course.findById(req.params.id);
+      if (!course) return res.status(404).json({ message: "Course not found" });
+
+      if (course.mentor.toString() !== req.user.id) {
+        return res.status(403).json({ message: "Not your course" });
+      }
+
+      let content = "";
+
+      // TEXT lesson
+      if (type === "text") {
+        content = textContent;
+      }
+
+      // VIDEO or PDF
+      if (type === "video" || type === "pdf") {
+        if (!req.file) {
+          return res.status(400).json({ message: "File required" });
+        }
+
+        const uploadResult = await cloudinary.uploader.upload_stream(
+          {
+            resource_type: type === "video" ? "video" : "raw",
+            folder: `courses/${course._id}`,
+          },
+          async (error, result) => {
+            if (error) throw error;
+
+            course.lessons.push({
+              title,
+              type,
+              content: result.secure_url,
+              isFree: isFree === "true",
+            });
+
+            await course.save();
+
+            res.status(201).json({
+              message: "Lesson added successfully",
+              lessons: course.lessons,
+            });
+          }
+        );
+
+        uploadResult.end(req.file.buffer);
+        return;
+      }
+
+      // Save TEXT lesson
+      course.lessons.push({
+        title,
+        type,
+        content,
+        isFree: isFree === "true",
+      });
+
+      await course.save();
+
+      res.status(201).json({
+        message: "Lesson added successfully",
+        lessons: course.lessons,
+      });
+
+    } catch (err) {
+      console.error("UPLOAD ERROR:", err);
+      res.status(500).json({ message: "Failed to add lesson" });
+    }
+  }
+);
+
+module.exports = router;
