@@ -9,6 +9,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import MentorDashboard from "./pages/MentorDashboard";
 import CreateCourse from "./pages/CreateCourse";
 import Courses from "./pages/Courses";
+import MentorCoursePreview from "./pages/MentorCoursePreview";
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
         <Route path="/mentor/course/:id" element={<ManageCourse />} />
         <Route path="/mentor/course/:id" element={<ManageCourse />} />
         <Route path="/course/:id" element={<CourseDetails />} />
+        <Route path="/mentor/course/:id" element={<MentorCoursePreview />}/>
+
       </Routes>
     </BrowserRouter>
   );

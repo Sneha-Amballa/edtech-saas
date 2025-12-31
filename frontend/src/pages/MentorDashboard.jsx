@@ -279,7 +279,7 @@ const MentorDashboard = () => {
                   {course.published ? (
                     <div className="published-actions">
                       <Link 
-                        to={`/course/${course._id}`} 
+                        to={`/mentor/course/${course._id}`} 
                         className="action-btn view"
                       >
                         <FaEye /> View Course
