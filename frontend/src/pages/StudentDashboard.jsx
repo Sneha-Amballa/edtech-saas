@@ -160,6 +160,9 @@ const loadEnrollments = async () => {
               <span className="user-role">Student</span>
             </div>
           </div>
+          <Link to="/profile" className="profile-btn">
+            Profile
+          </Link>
           <button className="logout-btn" onClick={handleLogout}>
             <FaSignOutAlt /> Logout
           </button>

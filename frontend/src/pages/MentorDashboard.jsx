@@ -102,6 +102,14 @@ const MentorDashboard = () => {
         </div>
 
         {/* Stats Cards */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ marginLeft: "auto" }}>
+            <Link to="/profile" className="profile-btn">
+              View Profile
+            </Link>
+          </div>
+        </div>
+
         <div className="mentor-stats">
           <div className="stat-card">
             <div className="stat-icon total">

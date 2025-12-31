@@ -7,6 +7,7 @@ import Courses from "./pages/Courses";
 
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentCourseDetails from "./pages/CourseDetails";
+import Profile from "./pages/Profile";
 import Certificate from "./pages/Certificate";
 
 import MentorDashboard from "./pages/MentorDashboard";
@@ -42,6 +43,15 @@ function App() {
           element={
             <ProtectedRoute role="student">
               <StudentCourseDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
