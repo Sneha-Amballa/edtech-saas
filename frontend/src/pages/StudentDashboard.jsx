@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getPublishedCourses } from "../services/courseService";
 import "../styles/studentDashboard.css";
+import { enrollInCourse, getMyCourses, getCounts } from "../services/enrollmentService";
 
 // Icons
 import { 
@@ -21,27 +22,27 @@ import {
   FaList
 } from "react-icons/fa";
 import { FiBook, FiTrendingUp } from "react-icons/fi";
-
 const StudentDashboard = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [enrolledCount, setEnrolledCount] = useState(0);
+  const [enrollments, setEnrollments] = useState([]);
+  const [inProgressCount, setInProgressCount] = useState(0);
+  const [completedCount, setCompletedCount] = useState(0);
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
   const [sortOption, setSortOption] = useState("recommended");
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadCourses();
-    // In a real app, you would fetch enrolled courses count from user data
-    const enrolled = JSON.parse(localStorage.getItem("enrolledCourses") || "[]");
-    setEnrolledCount(enrolled.length);
-    
-    // Get user data from localStorage or API
     const userData = JSON.parse(localStorage.getItem("user") || "{}");
     setUser(userData);
+
+    // Load both courses and enrollments on mount
+    loadCourses();
+    loadEnrollments();
   }, []);
 
   const loadCourses = async () => {
@@ -103,6 +104,39 @@ const StudentDashboard = () => {
   });
 
   const sortedAndFilteredCourses = sortCourses(filteredCourses);
+  const handleEnroll = async (courseId) => {
+  try {
+    await enrollInCourse(courseId);
+    // refresh enrollments and counts
+    await loadEnrollments();
+    alert("Enrolled successfully!");
+    navigate(`/course/${courseId}`);
+  } catch (err) {
+    alert(
+      err.response?.data?.message || "Enrollment failed"
+    );
+  }
+};
+
+const loadEnrollments = async () => {
+  try {
+    const res = await getMyCourses();
+    setEnrollments(res.data);
+
+    // fetch counts from backend (single source of truth)
+    const countsRes = await getCounts();
+    setEnrolledCount(countsRes.data.enrolledCount || 0);
+    setInProgressCount(countsRes.data.inProgressCount || 0);
+    setCompletedCount(countsRes.data.completedCount || 0);
+  } catch (err) {
+    console.error("Failed to load enrollments");
+  }
+};
+
+
+  const enrolledCourseIds = enrollments
+    .map((e) => (e.course && e.course._id ? e.course._id : e.course))
+    .map((id) => String(id));
 
   return (
     <div className="student-dashboard">
@@ -159,7 +193,7 @@ const StudentDashboard = () => {
             <FaChartLine />
           </div>
           <div>
-            <div className="stat-number">0</div>
+            <div className="stat-number">{inProgressCount}</div>
             <div className="stat-label">In Progress</div>
           </div>
         </div>
@@ -169,7 +203,7 @@ const StudentDashboard = () => {
             <FaStar />
           </div>
           <div>
-            <div className="stat-number">0</div>
+            <div className="stat-number">{completedCount}</div>
             <div className="stat-label">Completed</div>
           </div>
         </div>
@@ -362,9 +396,23 @@ const StudentDashboard = () => {
                       >
                         <FaPlayCircle /> View Details
                       </Link>
-                      <button className="enroll-btn">
-                        Enroll Now
-                      </button>
+                      {enrolledCourseIds.includes(course._id) ? (
+  <button
+    className="continue-btn"
+    onClick={() => navigate(`/course/${course._id}`)}
+  >
+    Continue Learning
+  </button>
+) : (
+  <button
+    className="enroll-btn"
+    onClick={() => handleEnroll(course._id)}
+  >
+    Enroll Now
+  </button>
+)}
+
+
                     </div>
                   </div>
                 </div>

@@ -282,13 +282,13 @@ const MentorDashboard = () => {
                         to={`/mentor/course/${course._id}`} 
                         className="action-btn view"
                       >
-                        <FaEye /> View Course
+                        <FaEye /> Preview Course
                       </Link>
                       <Link 
                         to={`/mentor/edit-course/${course._id}`}
                         className="action-btn edit"
                       >
-                        <FaEdit /> Edit
+                        <FaEdit /> Edit Details
                       </Link>
                     </div>
                   ) : (
@@ -303,7 +303,7 @@ const MentorDashboard = () => {
   to={`/mentor/course/${course._id}`}
   className="action-btn edit"
 >
-  <FaEdit /> Manage Course
+  <FaEdit /> Course Settings
 </Link>
 
                     </div>

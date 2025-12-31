@@ -29,6 +29,10 @@ const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+      enrolledCount: {
+        type: Number,
+        default: 0,
+      },
     lessons: [lessonSchema],
     published: {
       type: Boolean,

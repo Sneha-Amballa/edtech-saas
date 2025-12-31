@@ -4,6 +4,7 @@ const multer = require("multer");
 const Course = require("../models/Course");
 const cloudinary = require("../cloudinary");
 
+const Enrollment = require("../models/Enrollment");
 const router = express.Router();
 
 /* ================= AUTH ================= */
@@ -45,7 +46,14 @@ router.get("/", async (req, res) => {
   try {
     const courses = await Course.find({ published: true })
       .populate("mentor", "name");
-    res.json(courses);
+    // Include an `instructor` alias for frontend compatibility
+    const response = courses.map((c) => {
+      const obj = c.toObject();
+      obj.instructor = obj.mentor;
+      return obj;
+    });
+
+    res.json(response);
   } catch {
     res.status(500).json({ message: "Failed to fetch courses" });
   }
@@ -71,13 +79,31 @@ router.get("/:id/public", async (req, res) => {
         content: l.isFree ? l.content : null,
       }));
 
+    // Determine if the requesting user (if any) is enrolled
+    let isEnrolled = false;
+    const token = req.headers.authorization?.split(" ")[1];
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const existing = await Enrollment.findOne({
+          student: decoded._id,
+          course: course._id,
+        });
+        if (existing) isEnrolled = true;
+      } catch (e) {
+        // ignore invalid token — treat as not enrolled
+      }
+    }
+
     res.json({
       _id: course._id,
       title: course.title,
       description: course.description,
       price: course.price,
-      mentor: course.mentor,
+      instructor: course.mentor, // alias for frontend
       lessons,
+      enrolledCount: course.enrolledCount || 0,
+      isEnrolled,
     });
   } catch {
     res.status(500).json({ message: "Failed to load course" });

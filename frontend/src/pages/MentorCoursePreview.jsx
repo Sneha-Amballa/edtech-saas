@@ -157,6 +157,13 @@ const MentorCoursePreview = () => {
             </Link>
           </div>
         </div>
+
+        <div className="mentor-analytics">
+  <p><FaUsers /> {course.enrolledCount || 0} Enrollments</p>
+  <p><FaStar /> Rating: {course.rating || "N/A"}</p>
+  <p><FiTrendingUp /> Status: {course.published ? "Published" : "Draft"}</p>
+</div>
+
       </div>
     </div>
   );

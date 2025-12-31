@@ -18,9 +18,13 @@ const Login = () => {
     try {
       const res = await loginUser({ email, password });
 
-      // 3️⃣ Store token & role
+      // 3️⃣ Store token, role and user object (ProtectedRoute reads `user`)
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ token: res.data.token, role: res.data.role, name: res.data.name })
+      );
 
       // 4️⃣ Redirect based on role
       if (res.data.role === "student") navigate("/student");

@@ -19,6 +19,7 @@ import {
 } from "react-icons/fa";
 import { FiTrendingUp, FiBook } from "react-icons/fi";
 import "../styles/courseDetails.css";
+import { enrollInCourse, getMyCourses, markLessonComplete as markLessonCompleteService } from "../services/enrollmentService";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -30,6 +31,8 @@ const CourseDetails = () => {
   const [completedLessons, setCompletedLessons] = useState([]);
   const [progress, setProgress] = useState(0);
   const [user, setUser] = useState(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [status, setStatus] = useState(null);
 
   /* -------------------------------- LOAD COURSE -------------------------------- */
   useEffect(() => {
@@ -56,11 +59,6 @@ const CourseDetails = () => {
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user") || "{}");
     setUser(userData);
-
-    const completed = JSON.parse(
-      localStorage.getItem(`completed_${id}`) || "[]"
-    );
-    setCompletedLessons(completed);
   }, [id]);
 
   /* ------------------------------ CALCULATE PROGRESS ------------------------------ */
@@ -72,6 +70,31 @@ const CourseDetails = () => {
     setProgress(Math.round(percent));
   }, [completedLessons, course]);
 
+  /* ------------------------------ ENROLLMENT CHECK ------------------------------ */
+  const checkEnrollment = async () => {
+    try {
+      const res = await getMyCourses();
+      const enrollments = res.data || [];
+      const match = enrollments.find((e) => e.course._id === id);
+      if (match) {
+        setIsEnrolled(true);
+        setStatus(match.status);
+        setCompletedLessons(match.completedLessons || []);
+        setProgress(match.progress || 0);
+      } else {
+        setIsEnrolled(false);
+        setCompletedLessons([]);
+        setProgress(0);
+      }
+    } catch {
+      setIsEnrolled(false);
+    }
+  };
+
+  useEffect(() => {
+    checkEnrollment();
+  }, [id]);
+
   /* -------------------------------- ACTIONS -------------------------------- */
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -82,22 +105,43 @@ const CourseDetails = () => {
   const markLessonComplete = (lessonId) => {
     if (completedLessons.includes(lessonId)) return;
 
-    const updated = [...completedLessons, lessonId];
-    setCompletedLessons(updated);
-    localStorage.setItem(`completed_${id}`, JSON.stringify(updated));
+    // call backend to mark lesson complete and get updated enrollment
+    markLessonCompleteApi(lessonId);
   };
 
-  const handleEnroll = () => {
-    const enrolled = JSON.parse(
-      localStorage.getItem("enrolledCourses") || "[]"
-    );
+  const markLessonCompleteApi = async (lessonId) => {
+    try {
+      const res = await markLessonCompleteService(id, lessonId);
+      const enrollment = res.data.enrollment;
+      if (enrollment) {
+        setCompletedLessons(enrollment.completedLessons || []);
+        setProgress(enrollment.progress || 0);
+      }
 
-    if (!enrolled.includes(id)) {
-      enrolled.push(id);
-      localStorage.setItem("enrolledCourses", JSON.stringify(enrolled));
-      alert("Enrolled successfully!");
+      // if completed, show a toast
+      if (enrollment?.status === "completed") {
+        alert("Congratulations — course completed!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to mark complete");
     }
   };
+
+const handleEnroll = async () => {
+  try {
+    const res = await enrollInCourse(id);
+    const enrollment = res.data?.enrollment;
+    alert("Enrolled successfully!");
+    setIsEnrolled(true);
+    setCompletedLessons(enrollment?.completedLessons || []);
+    setProgress(enrollment?.progress || 0);
+  } catch (err) {
+    alert(err.response?.data?.message || "Enrollment failed");
+  }
+};
+
+
 
   if (loading) {
     return (
@@ -112,9 +156,8 @@ const CourseDetails = () => {
     return <h2>Course not found</h2>;
   }
 
-  const isEnrolled = JSON.parse(
-    localStorage.getItem("enrolledCourses") || "[]"
-  ).includes(id);
+
+
 
   return (
     <div className="course-details-container">
@@ -169,7 +212,7 @@ const CourseDetails = () => {
       <div className="course-content-wrapper">
         <div className="course-content-left">
           <div className="content-header">
-            <h2><FiBook /> Course Content</h2>
+            <h2><FiBook /> What you’ll learn</h2>
             <div className="progress-section">
               <span>{progress}% completed</span>
               <div className="progress-bar">
@@ -193,7 +236,11 @@ const CourseDetails = () => {
                 >
                   <div
                     className="lesson-header"
-                    onClick={() => canAccess && setActiveLesson(lesson)}
+                    onClick={() => {
+  if (!canAccess) return;
+  setActiveLesson(lesson);
+}}
+
                   >
                     <span className="lesson-number">
                       {isCompleted ? <FaCheckCircle /> : index + 1}
@@ -250,10 +297,30 @@ const CourseDetails = () => {
               <button className="enroll-btn" onClick={handleEnroll}>
                 Enroll Now
               </button>
-            ) : (
-              <div className="status-badge">
-                <FaUserGraduate /> Enrolled
+            ) : status === "completed" ? (
+              <div>
+                <button className="enroll-btn" disabled>
+                  Completed
+                </button>
+                <button
+                  className="enroll-btn"
+                  onClick={() => navigate(`/certificate/${id}`)}
+                  style={{ marginLeft: 8 }}
+                >
+                  🎓 View Certificate
+                </button>
               </div>
+            ) : (
+              <button
+                className="enroll-btn"
+                onClick={() => {
+                  // focus first available lesson
+                  const first = course.lessons.find((l) => l.isFree) || course.lessons[0];
+                  if (first) setActiveLesson(first);
+                }}
+              >
+                Continue Learning
+              </button>
             )}
 
             <ul>
