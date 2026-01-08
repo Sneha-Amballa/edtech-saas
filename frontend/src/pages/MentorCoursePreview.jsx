@@ -69,7 +69,7 @@ const MentorCoursePreview = () => {
         </div>
 
         <Link
-          to={`/mentor/edit-course/${course._id}`}
+          to={`/mentor/course/${course._id}/manage`}
           className="edit-course-btn"
         >
           <FaEdit /> Edit Course
@@ -150,7 +150,7 @@ const MentorCoursePreview = () => {
             </ul>
 
             <Link
-              to={`/mentor/edit-course/${course._id}`}
+              to={`/mentor/course/${course._id}/manage`}
               className="manage-course-btn"
             >
               <FaEdit /> Manage Course

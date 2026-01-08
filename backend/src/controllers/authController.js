@@ -5,7 +5,13 @@ const jwt = require("jsonwebtoken");
 // REGISTER
 exports.register = async (req, res) => {
   try {
+    console.log("[auth] register payload:", req.body);
     const { name, email, password, role } = req.body;
+
+    // Basic validation with clearer messages
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
     const allowedRoles = ["student", "mentor"];
     if (!allowedRoles.includes(role)) {
@@ -28,7 +34,8 @@ exports.register = async (req, res) => {
     });
 
     res.status(201).json({ message: "User registered successfully" });
-  } catch {
+  } catch (err) {
+    console.error("[auth] register error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -59,7 +66,8 @@ exports.login = async (req, res) => {
       role: user.role,
       name: user.name,
     });
-  } catch {
+  } catch (err) {
+    console.error("[auth] login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

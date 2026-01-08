@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getCourseById, addLesson } from "../services/courseService";
+import { getCourseById, addLesson, updateCourse, deleteLesson } from "../services/courseService";
 import { 
   FaArrowLeft, 
   FaBook, 
@@ -26,6 +26,8 @@ const ManageCourse = () => {
 
   const [course, setCourse] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const [editingDetails, setEditingDetails] = useState(false);
+  const [courseForm, setCourseForm] = useState({ title: "", description: "", price: "" });
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,6 +47,7 @@ const ManageCourse = () => {
       setLoading(true);
       const res = await getCourseById(id);
       setCourse(res.data);
+      setCourseForm({ title: res.data.title || "", description: res.data.description || "", price: res.data.price || "" });
       setError(null);
     } catch (err) {
       setError("Failed to load course. Please try again.");
@@ -177,7 +180,30 @@ const ManageCourse = () => {
                 </span>
               </div>
             </div>
+            <div style={{ marginLeft: 'auto' }}>
+              <button className="manage-btn-secondary" onClick={() => setEditingDetails(!editingDetails)}>
+                {editingDetails ? 'Cancel' : 'Edit Details'}
+              </button>
+            </div>
           </div>
+        {editingDetails && (
+          <form className="edit-course-form" onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              await updateCourse(id, courseForm);
+              alert('Course updated');
+              setEditingDetails(false);
+              loadCourse();
+            } catch (err) {
+              alert('Failed to update course');
+            }
+          }}>
+            <input value={courseForm.title} onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })} placeholder="Title" required />
+            <textarea value={courseForm.description} onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })} placeholder="Description" rows={3} />
+            <input value={courseForm.price} onChange={(e) => setCourseForm({ ...courseForm, price: e.target.value })} placeholder="Price" type="number" min="0" />
+            <button type="submit" className="manage-btn-primary">Save</button>
+          </form>
+        )}
         </div>
       </header>
 
@@ -467,6 +493,24 @@ const ManageCourse = () => {
                           Published
                         </span>
                       </div>
+                    </div>
+                    <div style={{ marginTop: 12 }}>
+                      <button
+                        className="manage-btn-secondary"
+                        onClick={async () => {
+                          if (!window.confirm('Delete this lesson?')) return;
+                          try {
+                            await deleteLesson(id, selectedLesson._id);
+                            alert('Lesson deleted');
+                            setSelectedLesson(null);
+                            loadCourse();
+                          } catch (err) {
+                            alert('Failed to delete lesson');
+                          }
+                        }}
+                      >
+                        <FaTimes /> Delete Lesson
+                      </button>
                     </div>
                   </div>
                 </div>

@@ -53,3 +53,24 @@ export const publishCourse = (id) => {
     { headers: { Authorization: `Bearer ${getToken()}` } }
   );
 };
+
+/* 👨‍🏫 Mentor – update course details */
+export const updateCourse = (id, data) => {
+  return axios.put(`${API}/${id}`, data, {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+};
+
+/* 👨‍🏫 Mentor – edit lesson */
+export const editLesson = (id, lessonId, data) => {
+  return axios.patch(`${API}/${id}/lessons/${lessonId}`, data, {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+};
+
+/* 👨‍🏫 Mentor – delete lesson */
+export const deleteLesson = (id, lessonId) => {
+  return axios.delete(`${API}/${id}/lessons/${lessonId}`, {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+};

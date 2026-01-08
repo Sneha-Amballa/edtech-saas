@@ -293,7 +293,7 @@ const MentorDashboard = () => {
                         <FaEye /> Preview Course
                       </Link>
                       <Link 
-                        to={`/mentor/edit-course/${course._id}`}
+                        to={`/mentor/course/${course._id}/manage`}
                         className="action-btn edit"
                       >
                         <FaEdit /> Edit Details
@@ -307,12 +307,12 @@ const MentorDashboard = () => {
                       >
                         <FaRocket /> Publish Course
                       </button>
-                      <Link 
-  to={`/mentor/course/${course._id}`}
-  className="action-btn edit"
->
-  <FaEdit /> Course Settings
-</Link>
+                      <Link
+                        to={`/mentor/course/${course._id}/manage`}
+                        className="action-btn edit"
+                      >
+                        <FaEdit /> Course Settings
+                      </Link>
 
                     </div>
                   )}
