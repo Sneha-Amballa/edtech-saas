@@ -290,29 +290,6 @@ const Profile = () => {
             <p>Manage your account and track your progress</p>
           </div>
           
-          <div className="header-right">
-            <div className="time-range-selector">
-              <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)}>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="quarter">This Quarter</option>
-                <option value="year">This Year</option>
-              </select>
-            </div>
-            
-            <div className="header-actions">
-              <Link to="/student/notifications" className="notification-btn">
-                <FaBell />
-                <span className="notification-badge">3</span>
-              </Link>
-              <Link to="/student/messages" className="message-btn">
-                <FaComments />
-              </Link>
-              <div className="user-avatar-small">
-                {getInitials(profile.name)}
-              </div>
-            </div>
-          </div>
         </motion.header>
 
         {/* Profile Tabs */}

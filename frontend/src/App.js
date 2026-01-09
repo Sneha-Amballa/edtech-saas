@@ -8,6 +8,7 @@ import Courses from "./pages/Courses";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentCourseDetails from "./pages/CourseDetails";
 import StudentMessages from "./pages/StudentMessages";
+import MyCourses from "./pages/MyCourses";
 import Profile from "./pages/Profile";
 import Certificate from "./pages/Certificate";
 
@@ -63,6 +64,15 @@ function App() {
           element={
             <ProtectedRoute role="student">
               <StudentMessages />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/mycourses"
+          element={
+            <ProtectedRoute role="student">
+              <MyCourses />
             </ProtectedRoute>
           }
         />

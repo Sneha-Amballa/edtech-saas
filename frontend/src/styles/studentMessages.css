@@ -950,3 +950,128 @@
     flex-wrap: wrap;
   }
 }
+/* =====================================================
+   🔥 STUDENT MESSAGES — FINAL HARD RESET FIX
+   ===================================================== */
+
+/* -----------------------------------------------------
+   1️⃣ FIX HEADER: Back to Dashboard LEFT MOST
+----------------------------------------------------- */
+.messages-header .header-content {
+  justify-content: space-between !important;
+}
+
+.messages-header .header-left {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.messages-header .back-btn {
+  margin: 0 !important;
+}
+
+/* Breadcrumb stays next to back button */
+.messages-header .breadcrumb {
+  margin: 0 !important;
+}
+
+
+/* -----------------------------------------------------
+   2️⃣ FIX HERO TEXT VISIBILITY (Your Messages + stats)
+----------------------------------------------------- */
+.messages-hero {
+  isolation: isolate;
+}
+
+.messages-hero * {
+  opacity: 1 !important;
+}
+
+/* Hero title */
+.messages-hero .hero-title {
+  color: #ffffff !important;
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+}
+
+/* Hero subtitle */
+.messages-hero .hero-subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Hero stat cards */
+.messages-hero .stat-card {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Hero stat values */
+.messages-hero .stat-value {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Hero stat labels */
+.messages-hero .stat-label {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+
+/* -----------------------------------------------------
+   3️⃣ REMOVE BLUE BACKGROUND FROM COURSE TITLES
+----------------------------------------------------- */
+
+/* Course group title */
+.messages-main .course-title {
+  background: transparent !important;
+  color: #0f172a !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Prevent pseudo elements */
+.messages-main .course-title::before,
+.messages-main .course-title::after {
+  content: none !important;
+}
+
+/* Prevent gradient bleed */
+.course-group,
+.course-group * {
+  background-clip: padding-box;
+}
+
+/* Isolation to stop style leaks */
+.course-group {
+  isolation: isolate;
+  position: relative;
+}
+
+
+/* -----------------------------------------------------
+   4️⃣ CHAT CARD SAFETY (no gradient bleed)
+----------------------------------------------------- */
+.chat-card {
+  background: #f8fafc !important;
+}
+
+.chat-card.unread {
+  background: rgba(37, 99, 235, 0.05) !important;
+}
+
+.chat-card:hover {
+  background: #ffffff !important;
+}
+
+
+/* -----------------------------------------------------
+   5️⃣ ENSURE TEXT ALWAYS VISIBLE
+----------------------------------------------------- */
+.chat-card *,
+.course-group *,
+.messages-main * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}

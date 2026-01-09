@@ -171,7 +171,7 @@ body {
 }
 
 .user-info h4 {
-  color: var(--gray-900);
+  color: #3a0ca3;
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.25rem;
@@ -179,8 +179,7 @@ body {
 
 .user-info p {
   font-size: 0.875rem;
-  color: var(--gray-400);
-  color: var(--gray-500); 
+  color: #8b6ad6;
 }
 
 /* Sidebar Navigation */
@@ -282,10 +281,12 @@ body {
 
 .header-left h1 {
   font-family: 'Poppins', sans-serif;
-  font-size: 1.875rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--gray-900);
   margin-bottom: 0.25rem;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 .header-left p {
@@ -853,15 +854,20 @@ body {
   font-family: 'Poppins', sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--gray-900);
-  margin-bottom: 0.25rem;
-  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: -webkit-box;
 }
 
 .course-instructor {
   font-size: 0.875rem;
   color: var(--gray-600);
   margin-bottom: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .course-description {
@@ -870,23 +876,29 @@ body {
   line-height: 1.5;
   margin-bottom: 1rem;
   display: -webkit-box;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .course-meta {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-bottom: 1rem;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .meta-item {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.375rem;
   font-size: 0.75rem;
   color: var(--gray-600);
+  white-space: nowrap;
+  padding: 0.25rem 0;
 }
 
 .meta-item svg {
@@ -1190,7 +1202,9 @@ body {
 .course-card {
   background: #ffffff;
   isolation: isolate;
+  opacity: 1 !important;
 }
+
 .course-card,
 .course-content,
 .course-image {
@@ -1198,19 +1212,167 @@ body {
 }
 
 .course-title {
-  color: #0f172a !important; /* dark text */
-  background: transparent;
+  color: #0f172a !important;
 }
+
 .course-content {
   background: #ffffff;
   position: relative;
   z-index: 2;
-}
-.course-image {
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
+  opacity: 1 !important;
 }
 
-.course-title {
-  color: #0f172a !important; /* dark navy */
+.progress-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+  z-index: 10;
+}
+
+.progress-bar-large {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar-large .progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.progress-bar-large .progress-fill.progress-success {
+  background: #4ade80;
+}
+
+.progress-bar-large .progress-fill.progress-warning {
+  background: #fbbf24;
+}
+
+.progress-bar-large .progress-fill.progress-danger {
+  background: #f87171;
+}
+
+.progress-text {
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.course-badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.course-badge.completed {
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  color: white;
+}
+
+/* =====================================================
+   🔥 FINAL HARD FIX: DASHBOARD COURSE TITLE BLUE BG
+   ===================================================== */
+
+/* 1️⃣ Kill any gradient / blue background leaking into cards */
+.course-card,
+.course-card * {
+  background-clip: padding-box;
+}
+
+/* 2️⃣ Remove background from course header inside cards */
+.course-card .course-header {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 3️⃣ Force clean title styling (NO background) */
+.course-card .course-title {
+  background: transparent !important;
+  color: #0f172a !important;   /* solid dark text */
+  font-size: 1.125rem;
+  font-weight: 600;
+  padding: 0 !important;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+/* 4️⃣ Prevent hero / overlay / progress layers affecting cards */
+.course-card {
+  isolation: isolate;
+  position: relative;
+  z-index: 1;
+}
+
+/* 5️⃣ Keep content above everything */
+.course-card .course-content {
+  position: relative;
+  z-index: 2;
+  background: #ffffff !important;
+}
+
+/* 6️⃣ Image overlay safety (if progress / gradient exists) */
+.course-card .course-image::after {
+  display: none !important;
+}
+
+/* 7️⃣ Ensure no pseudo elements paint background */
+.course-card .course-title::before,
+.course-card .course-title::after {
+  content: none !important;
+}
+/* =====================================================
+   ✅ FIX: SHOW COURSE META (Self-paced / students / level)
+   ===================================================== */
+
+/* Force meta container to be visible */
+.course-card .course-meta {
+  display: flex !important;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Individual meta item */
+.course-card .meta-item {
+  display: flex !important;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #475569 !important;   /* slate-600 */
+  background: #f1f5f9;         /* subtle light bg */
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Meta icons */
+.course-card .meta-item svg {
+  color: #64748b !important;   /* darker icon */
+  font-size: 0.8rem;
+}
+
+/* Ensure nothing fades it */
+.course-card .meta-item,
+.course-card .course-meta * {
+  opacity: 1 !important;
+}
+
+/* Prevent hero/meta styles leaking */
+.course-hero .meta-item {
+  background: transparent !important;
 }
