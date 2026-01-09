@@ -266,10 +266,6 @@ const Profile = () => {
             <FaUserCircle />
             <span>Profile</span>
           </Link>
-          <Link to="/student/settings" className="nav-item">
-            <FaCog />
-            <span>Settings</span>
-          </Link>
         </nav>
 
         <div className="sidebar-footer">

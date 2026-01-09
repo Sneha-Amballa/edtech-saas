@@ -237,10 +237,6 @@ const StudentDashboard = () => {
             <FaUserCircle />
             <span>Profile</span>
           </Link>
-          <Link to="/student/settings" className="nav-item">
-            <FaCog />
-            <span>Settings</span>
-          </Link>
         </nav>
 
         <div className="sidebar-footer">
@@ -384,31 +380,8 @@ const StudentDashboard = () => {
         >
           <div className="section-header">
             <h2>Browse by Category</h2>
-            <button 
-              className="view-all-btn"
-              onClick={() => setShowCategories(!showCategories)}
-            >
-              {showCategories ? 'Show Less' : 'All Categories'}
-              {showCategories ? <FaChevronUp /> : <FaChevronDown />}
-            </button>
           </div>
 
-          <div className={`categories-grid ${showCategories ? 'expanded' : ''}`}>
-            {categories.slice(0, showCategories ? categories.length : 6).map((category, index) => (
-              <motion.button
-                key={category}
-                className={`category-chip ${selectedCategory === category ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category)}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {category === 'all' ? 'All Topics' : category}
-              </motion.button>
-            ))}
-          </div>
         </motion.section>
 
         {/* Courses Section */}

@@ -16,9 +16,22 @@ import {
   FaArrowLeft,
   FaUserCircle,
   FaSignOutAlt,
+  FaPlay,
+  FaBookOpen,
+  FaGraduationCap,
+  FaCertificate,
+  FaArrowRight,
+  FaChevronRight,
+  FaChevronDown,
+  FaRegCircle,
+  FaRegCheckCircle,
+  FaTrophy,
+  FaMedal,
+  FaQuestionCircle,
   FaComments
 } from "react-icons/fa";
-import { FiTrendingUp, FiBook } from "react-icons/fi";
+import { FiTrendingUp, FiBook, FiCalendar, FiBarChart2 } from "react-icons/fi";
+import { GiDuration } from "react-icons/gi";
 import "../styles/courseDetails.css";
 import { enrollInCourse, getMyCourses, markLessonComplete as markLessonCompleteService } from "../services/enrollmentService";
 import ChatModal from "../components/ChatModal";
@@ -35,7 +48,8 @@ const CourseDetails = () => {
   const [user, setUser] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [status, setStatus] = useState(null);
-  const [showChat, setShowChat] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [expandedLessons, setExpandedLessons] = useState({});
 
   /* -------------------------------- LOAD COURSE -------------------------------- */
   useEffect(() => {
@@ -107,8 +121,6 @@ const CourseDetails = () => {
 
   const markLessonComplete = (lessonId) => {
     if (completedLessons.includes(lessonId)) return;
-
-    // call backend to mark lesson complete and get updated enrollment
     markLessonCompleteApi(lessonId);
   };
 
@@ -121,7 +133,6 @@ const CourseDetails = () => {
         setProgress(enrollment.progress || 0);
       }
 
-      // if completed, show a toast
       if (enrollment?.status === "completed") {
         alert("Congratulations — course completed!");
       }
@@ -131,20 +142,25 @@ const CourseDetails = () => {
     }
   };
 
-const handleEnroll = async () => {
-  try {
-    const res = await enrollInCourse(id);
-    const enrollment = res.data?.enrollment;
-    alert("Enrolled successfully!");
-    setIsEnrolled(true);
-    setCompletedLessons(enrollment?.completedLessons || []);
-    setProgress(enrollment?.progress || 0);
-  } catch (err) {
-    alert(err.response?.data?.message || "Enrollment failed");
-  }
-};
+  const handleEnroll = async () => {
+    try {
+      const res = await enrollInCourse(id);
+      const enrollment = res.data?.enrollment;
+      alert("Enrolled successfully!");
+      setIsEnrolled(true);
+      setCompletedLessons(enrollment?.completedLessons || []);
+      setProgress(enrollment?.progress || 0);
+    } catch (err) {
+      alert(err.response?.data?.message || "Enrollment failed");
+    }
+  };
 
-
+  const toggleLessonExpansion = (lessonId) => {
+    setExpandedLessons(prev => ({
+      ...prev,
+      [lessonId]: !prev[lessonId]
+    }));
+  };
 
   if (loading) {
     return (
@@ -156,202 +172,389 @@ const handleEnroll = async () => {
   }
 
   if (!course) {
-    return <h2>Course not found</h2>;
+    return <h2 className="course-not-found">Course not found</h2>;
   }
-
-
-
 
   return (
     <div className="course-details-container">
-      {showChat && (
-        <ChatModal
-          courseId={id}
-          mentorName={course?.instructor?.name || "Mentor"}
-          onClose={() => setShowChat(false)}
-        />
-      )}
-
       {/* HEADER */}
       <header className="course-header">
-        <div className="header-left">
-          <button onClick={() => navigate("/student")} className="back-btn">
-            <FaArrowLeft /> Back
-          </button>
-          <h1 className="course-title">{course.title}</h1>
-        </div>
-
-        <div className="profile-section">
-          <div className="user-info">
-            <FaUserCircle className="user-avatar" />
-            <div>
-              <span className="user-name">{user?.name || "Student"}</span>
-              <span className="user-role">Student</span>
+        <div className="header-content">
+          <div className="header-left">
+            <button onClick={() => navigate("/student")} className="back-btn">
+              <FaArrowLeft /> Back to Dashboard
+            </button>
+            <div className="breadcrumb">
+              <span className="crumb">Courses</span>
+              <FaChevronRight className="crumb-separator" />
+              <span className="crumb active">{course.title}</span>
             </div>
           </div>
-          <button className="logout-btn" onClick={handleLogout}>
-            <FaSignOutAlt /> Logout
-          </button>
+
+          <div className="header-right">
+            <div className="user-profile">
+              <div className="user-avatar">
+                <FaUserCircle />
+              </div>
+              <div className="user-info">
+                <span className="user-name">{user?.name || "Student"}</span>
+                <span className="user-role">Student</span>
+              </div>
+            </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              <FaSignOutAlt />
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* OVERVIEW */}
-      <div className="course-overview">
-        <div className="course-meta-info">
-          <div className="instructor-info">
-            <div className="instructor-avatar">
-              {course.instructor?.name?.charAt(0) || "I"}
+      {/* MAIN CONTENT */}
+      <main className="course-main">
+        {/* HERO SECTION */}
+        <div className="course-hero">
+          <div className="hero-content">
+            <div className="course-badge">
+              <FaBookOpen className="badge-icon" />
+              <span>{course.category || "Development"}</span>
             </div>
-            <div>
-              <p className="instructor-label">Instructor</p>
-              <h3>{course.instructor?.name || "Unknown"}</h3>
-            </div>
-          </div>
-
-          <div className="course-stats">
-            <span><FaStar /> {course.rating || "4.5"}</span>
-            <span><FaUsers /> {course.enrolledCount || 0}</span>
-            <span><FiTrendingUp /> {course.level || "All Levels"}</span>
-            <span><FaClock /> {course.duration || "Self paced"}</span>
-          </div>
-        </div>
-
-        <p>{course.description}</p>
-      </div>
-
-      {/* CONTENT */}
-      <div className="course-content-wrapper">
-        <div className="course-content-left">
-          <div className="content-header">
-            <h2><FiBook /> What you’ll learn</h2>
-            <div className="progress-section">
-              <span>{progress}% completed</span>
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${progress}%` }}
-                ></div>
+            <h1 className="course-title">{course.title}</h1>
+            <p className="course-description">{course.description}</p>
+            
+            <div className="hero-meta">
+              <div className="meta-item">
+                <FiBarChart2 className="meta-icon" />
+                <span>{course.level || "All Levels"}</span>
+              </div>
+              <div className="meta-item">
+                <GiDuration className="meta-icon" />
+                <span>{course.duration || "Self-paced"}</span>
+              </div>
+              <div className="meta-item">
+                <FaUsers className="meta-icon" />
+                <span>{course.enrolledCount || 0} enrolled</span>
+              </div>
+              <div className="meta-item">
+                <FaStar className="meta-icon" />
+                <span>{course.rating || "4.5"}</span>
               </div>
             </div>
           </div>
 
-          <div className="lessons-list">
-            {course.lessons.map((lesson, index) => {
-              const canAccess = lesson.isFree || isEnrolled;
-              const isCompleted = completedLessons.includes(lesson._id);
-
-              return (
-                <div
-                  key={lesson._id}
-                  className={`lesson-item ${isCompleted ? "completed" : ""}`}
-                >
-                  <div
-                    className="lesson-header"
-                    onClick={() => {
-  if (!canAccess) return;
-  setActiveLesson(lesson);
-}}
-
-                  >
-                    <span className="lesson-number">
-                      {isCompleted ? <FaCheckCircle /> : index + 1}
-                    </span>
-
-                    <div className="lesson-info">
-                      <h4>{lesson.title}</h4>
-                      <span>
-                        {lesson.type === "video" ? <FaVideo /> : <FaFileAlt />}
-                        {lesson.type}
-                      </span>
-                    </div>
-
-                    {!canAccess && (
-                      <span className="access-badge locked">
-                        <FaLock /> Locked
-                      </span>
-                    )}
-                  </div>
-
-                  {activeLesson?._id === lesson._id && canAccess && (
-                    <div className="lesson-content">
-                      {lesson.type === "video" ? (
-                        <video
-                          src={lesson.content}
-                          controls
-                          onEnded={() => markLessonComplete(lesson._id)}
-                        />
-                      ) : (
-                        <p>{lesson.content}</p>
-                      )}
-
-                      <button
-                        className="mark-complete-btn"
-                        onClick={() => markLessonComplete(lesson._id)}
-                        disabled={isCompleted}
-                      >
-                        {isCompleted ? "Completed" : "Mark Complete"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* RIGHT CARD */}
-        <div className="course-content-right">
-          <div className="course-card">
-            <h2>₹{course.price}</h2>
-
+          <div className="hero-action">
+            <div className="price-section">
+              <div className="price-label">Course Price</div>
+              <div className="price-amount">₹{course.price}</div>
+              {course.originalPrice && (
+                <div className="original-price">₹{course.originalPrice}</div>
+              )}
+            </div>
+            
             {!isEnrolled ? (
-              <button className="enroll-btn" onClick={handleEnroll}>
-                Enroll Now
+              <button className="enroll-btn primary" onClick={handleEnroll}>
+                <FaGraduationCap /> Enroll Now
               </button>
             ) : status === "completed" ? (
-              <div>
-                <button className="enroll-btn" disabled>
-                  Completed
+              <div className="completed-actions">
+                <button className="enroll-btn success" disabled>
+                  <FaTrophy /> Course Completed
                 </button>
-                <button
-                  className="enroll-btn"
-                  onClick={() => navigate(`/certificate/${id}`)}
-                  style={{ marginLeft: 8 }}
-                >
-                  🎓 View Certificate
+                <button className="certificate-btn" onClick={() => navigate(`/certificate/${id}`)}>
+                  <FaCertificate /> View Certificate
                 </button>
               </div>
             ) : (
-              <button
-                className="enroll-btn"
-                onClick={() => {
-                  // focus first available lesson
-                  const first = course.lessons.find((l) => l.isFree) || course.lessons[0];
-                  if (first) setActiveLesson(first);
-                }}
-              >
-                Continue Learning
+              <button className="enroll-btn continue" onClick={() => {
+                const first = course.lessons.find((l) => l.isFree) || course.lessons[0];
+                if (first) setActiveLesson(first);
+              }}>
+                <FaPlay /> Continue Learning
               </button>
             )}
-
-            {isEnrolled && (
-              <button
-                className="doubt-btn"
-                onClick={() => setShowChat(true)}
-              >
-                <FaComments /> Ask Mentor Doubt
-              </button>
-            )}
-
-            <ul>
-              <li><FaVideo /> Video lessons</li>
-              <li><FaFileAlt /> Text lessons</li>
-              <li><FaChartLine /> Progress tracking</li>
-              <li><FaStar /> Certificate</li>
-            </ul>
+            
+            <div className="action-features">
+              <div className="feature">
+                <FaVideo /> 30-Day Money-Back Guarantee
+              </div>
+              <div className="feature">
+                <FaCertificate /> Certificate of Completion
+              </div>
+              <div className="feature">
+                <FaClock /> Lifetime Access
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* CONTENT GRID */}
+        <div className="content-grid">
+          {/* LEFT COLUMN - COURSE CONTENT */}
+          <div className="content-left">
+            {/* PROGRESS SECTION */}
+            <div className="progress-card">
+              <div className="progress-header">
+                <h3><FiBook /> Your Learning Progress</h3>
+                <span className="progress-percent">{progress}%</span>
+              </div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+              </div>
+              <div className="progress-stats">
+                <div className="stat">
+                  <span className="stat-value">{completedLessons.length}</span>
+                  <span className="stat-label">Lessons Completed</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-value">{course.lessons.length - completedLessons.length}</span>
+                  <span className="stat-label">Remaining</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-value">{course.lessons.length}</span>
+                  <span className="stat-label">Total Lessons</span>
+                </div>
+              </div>
+            </div>
+
+            {/* LESSONS SECTION */}
+            <div className="lessons-card">
+              <div className="card-header">
+                <h3><FaBookOpen /> Course Curriculum</h3>
+                <span className="lessons-count">{course.lessons.length} lessons</span>
+              </div>
+              
+              <div className="lessons-list">
+                {course.lessons.map((lesson, index) => {
+                  const canAccess = lesson.isFree || isEnrolled;
+                  const isCompleted = completedLessons.includes(lesson._id);
+                  const isExpanded = expandedLessons[lesson._id];
+
+                  return (
+                    <div
+                      key={lesson._id}
+                      className={`lesson-item ${isCompleted ? "completed" : ""} ${canAccess ? "accessible" : "locked"} ${activeLesson?._id === lesson._id ? "active" : ""}`}
+                    >
+                      <div className="lesson-header" onClick={() => {
+                        if (!canAccess) return;
+                        toggleLessonExpansion(lesson._id);
+                      }}>
+                        <div className="lesson-status">
+                          {isCompleted ? (
+                            <FaCheckCircle className="completed-icon" />
+                          ) : (
+                            <div className="lesson-number">{index + 1}</div>
+                          )}
+                        </div>
+                        
+                        <div className="lesson-info">
+                          <div className="lesson-title-row">
+                            <h4>{lesson.title}</h4>
+                            <span className="lesson-type">
+                              {lesson.type === "video" ? <FaVideo /> : <FaFileAlt />}
+                              {lesson.type}
+                            </span>
+                          </div>
+                          <div className="lesson-meta">
+                            <span className="duration">
+                              <FaClock /> {lesson.duration || "10 mins"}
+                            </span>
+                            {!lesson.isFree && !isEnrolled && (
+                              <span className="premium-badge">
+                                <FaStar /> Premium
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="lesson-actions">
+                          {canAccess ? (
+                            <button className="expand-btn">
+                              {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
+                            </button>
+                          ) : (
+                            <span className="lock-icon">
+                              <FaLock />
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {isExpanded && canAccess && (
+                        <div className="lesson-content">
+                          {lesson.type === "video" ? (
+                            <div className="video-container">
+                              <video src={lesson.content} controls />
+                              <div className="video-overlay">
+                                <button
+                                  className="mark-complete-btn"
+                                  onClick={() => markLessonComplete(lesson._id)}
+                                  disabled={isCompleted}
+                                >
+                                  {isCompleted ? (
+                                    <><FaCheckCircle /> Completed</>
+                                  ) : (
+                                    <><FaRegCircle /> Mark as Complete</>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-content">
+                              <div className="content-text">{lesson.content}</div>
+                              <button
+                                className="mark-complete-btn"
+                                onClick={() => markLessonComplete(lesson._id)}
+                                disabled={isCompleted}
+                              >
+                                {isCompleted ? (
+                                  <><FaCheckCircle /> Completed</>
+                                ) : (
+                                  <><FaRegCircle /> Mark as Complete</>
+                                )}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* WHAT YOU'LL LEARN */}
+            <div className="learnings-card">
+              <h3><FaGraduationCap /> What You'll Learn</h3>
+              <div className="learnings-grid">
+                <div className="learning-item">
+                  <FaCheckCircle className="check-icon" />
+                  <span>Master key concepts and techniques</span>
+                </div>
+                <div className="learning-item">
+                  <FaCheckCircle className="check-icon" />
+                  <span>Build real-world projects</span>
+                </div>
+                <div className="learning-item">
+                  <FaCheckCircle className="check-icon" />
+                  <span>Get certified upon completion</span>
+                </div>
+                <div className="learning-item">
+                  <FaCheckCircle className="check-icon" />
+                  <span>Access to exclusive resources</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN - SIDEBAR */}
+          <div className="content-right">
+            {/* INSTRUCTOR CARD */}
+            <div className="instructor-card">
+              <div className="instructor-header">
+                <div className="instructor-avatar">
+                  {course.instructor?.name?.charAt(0) || "I"}
+                </div>
+                <div className="instructor-info">
+                  <span className="instructor-label">Instructor</span>
+                  <h4>{course.instructor?.name || "Expert Instructor"}</h4>
+                </div>
+              </div>
+              <p className="instructor-bio">
+                Experienced professional with years of industry experience
+              </p>
+              <button className="ask-doubt-btn" onClick={() => setShowChatModal(true)}>
+                <FaComments /> Ask a Doubt
+              </button>
+            </div>
+
+            {/* COURSE FEATURES */}
+            <div className="features-card">
+              <h4><FaStar /> Course Features</h4>
+              <ul className="features-list">
+                <li>
+                  <FaVideo className="feature-icon" />
+                  <span>Video Lessons</span>
+                </li>
+                <li>
+                  <FaFileAlt className="feature-icon" />
+                  <span>Downloadable Resources</span>
+                </li>
+                <li>
+                  <FaChartLine className="feature-icon" />
+                  <span>Progress Tracking</span>
+                </li>
+                <li>
+                  <FaCertificate className="feature-icon" />
+                  <span>Certificate of Completion</span>
+                </li>
+                <li>
+                  <FaClock className="feature-icon" />
+                  <span>Lifetime Access</span>
+                </li>
+                <li>
+                  <FaQuestionCircle className="feature-icon" />
+                  <span>Q&A Support</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* ACHIEVEMENTS */}
+            {isEnrolled && (
+              <div className="achievements-card">
+                <div className="achievements-header">
+                  <FaTrophy className="trophy-icon" />
+                  <h4>Your Achievements</h4>
+                </div>
+                <div className="achievements-list">
+                  <div className={`achievement ${progress >= 25 ? 'unlocked' : 'locked'}`}>
+                    <div className="achievement-icon">
+                      {progress >= 25 ? <FaMedal /> : <FaRegCircle />}
+                    </div>
+                    <div className="achievement-info">
+                      <span className="achievement-title">Getting Started</span>
+                      <span className="achievement-desc">Complete 25% of course</span>
+                    </div>
+                  </div>
+                  <div className={`achievement ${progress >= 50 ? 'unlocked' : 'locked'}`}>
+                    <div className="achievement-icon">
+                      {progress >= 50 ? <FaMedal /> : <FaRegCircle />}
+                    </div>
+                    <div className="achievement-info">
+                      <span className="achievement-title">Halfway There</span>
+                      <span className="achievement-desc">Complete 50% of course</span>
+                    </div>
+                  </div>
+                  <div className={`achievement ${progress >= 100 ? 'unlocked' : 'locked'}`}>
+                    <div className="achievement-icon">
+                      {progress >= 100 ? <FaMedal /> : <FaRegCircle />}
+                    </div>
+                    <div className="achievement-info">
+                      <span className="achievement-title">Course Master</span>
+                      <span className="achievement-desc">Complete 100% of course</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* NEED HELP */}
+            <div className="help-card">
+              <FaQuestionCircle className="help-icon" />
+              <h4>Need Help?</h4>
+              <p>Our support team is here to assist you</p>
+              <button className="help-btn" onClick={() => setShowChatModal(true)}>
+                Contact Support
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {showChatModal && (
+        <ChatModal
+          courseId={id}
+          mentorName={course.instructor?.name}
+          onClose={() => setShowChatModal(false)}
+        />
+      )}
     </div>
   );
 };
