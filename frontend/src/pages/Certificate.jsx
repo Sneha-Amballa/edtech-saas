@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getCertificate } from "../services/enrollmentService";
 import "../styles/courseDetails.css";
 import "../styles/certificate.css";
+
 const Certificate = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -45,30 +46,112 @@ const Certificate = () => {
     }
   };
 
-  if (loading) return <div>Loading certificate...</div>;
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading certificate...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="certificate-page">
-      <div className="certificate-actions">
-        <button onClick={() => navigate(-1)}>Back</button>
-        <button onClick={handlePrint}>Print / Save as PDF</button>
-        <button onClick={handleDownloadPNG}>Download PNG</button>
+      <div className="certificate-header">
+        <div className="header-content">
+          <h1 className="page-title">Certificate of Completion</h1>
+          <p className="page-subtitle">Your achievement is ready to share</p>
+        </div>
+        <div className="certificate-actions">
+          <button 
+            className="action-btn back-btn" 
+            onClick={() => navigate(-1)}
+          >
+            ← Back
+          </button>
+          <button 
+            className="action-btn primary-btn" 
+            onClick={handlePrint}
+          >
+            🖨️ Print / Save PDF
+          </button>
+          <button 
+            className="action-btn secondary-btn" 
+            onClick={handleDownloadPNG}
+          >
+            📥 Download PNG
+          </button>
+        </div>
       </div>
 
-      <div id="certificate" ref={containerRef} className="certificate-card">
-        <h2 className="cert-title">Certificate of Completion</h2>
-        <p className="cert-sub">This certifies that</p>
-        <h1 className="cert-name">{certificate.studentName}</h1>
-        <p className="cert-text">has successfully completed the course</p>
-        <h2 className="cert-course">{certificate.courseTitle}</h2>
-        <p className="cert-meta">
-          Mentor: {certificate.mentorName} • Completed on: {new Date(certificate.completionDate).toLocaleDateString()}
-        </p>
+      <div className="certificate-container">
+        <div id="certificate" ref={containerRef} className="certificate-card">
+          {/* Decorative Border Elements */}
+          <div className="border-corner top-left"></div>
+          <div className="border-corner top-right"></div>
+          <div className="border-corner bottom-left"></div>
+          <div className="border-corner bottom-right"></div>
+          
+          {/* Header */}
+          <div className="certificate-header-decoration">
+            <div className="certificate-seal">
+              <div className="seal-inner">
+                <span>✓</span>
+              </div>
+            </div>
+            <h2 className="cert-title">Certificate of Completion</h2>
+            <div className="decoration-line"></div>
+          </div>
 
-        <div className="cert-footer">
-          <div>Certificate ID: <strong>{certificate.certificateId}</strong></div>
-          <div className="cert-sign">Authorized Signature</div>
+          {/* Content */}
+          <div className="certificate-content">
+            <p className="cert-sub">This is to certify that</p>
+            <h1 className="cert-name">{certificate.studentName}</h1>
+            <p className="cert-text">
+              has successfully completed the course with distinction
+            </p>
+            <h2 className="cert-course">{certificate.courseTitle}</h2>
+            
+            <div className="certificate-details">
+              <div className="detail-item">
+                <span className="detail-label">Mentor:</span>
+                <span className="detail-value">{certificate.mentorName}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Completed on:</span>
+                <span className="detail-value">
+                  {new Date(certificate.completionDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="cert-footer">
+            <div className="certificate-id">
+              <span className="id-label">Certificate ID:</span>
+              <strong className="id-value">{certificate.certificateId}</strong>
+            </div>
+            <div className="signature-section">
+              <div className="signature-line"></div>
+              <div className="cert-sign">Authorized Signature</div>
+            </div>
+          </div>
+
+          {/* Watermark */}
+          <div className="certificate-watermark">ACHIEVEMENT</div>
         </div>
+      </div>
+
+      <div className="certificate-info">
+        <p className="info-text">
+          💡 <strong>Tip:</strong> Use the buttons above to print, save as PDF, or download as PNG.
+          For best print results, use landscape orientation.
+        </p>
       </div>
     </div>
   );

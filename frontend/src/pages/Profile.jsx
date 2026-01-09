@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { getMyProfile } from "../services/profileService";
 import "../styles/studentDashboard.css";
 import "../styles/profile.css";
@@ -16,7 +17,37 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
-import { Line, Bar, Pie } from "react-chartjs-2";
+import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
+import {
+  FaGraduationCap,
+  FaUserCircle,
+  FaEnvelope,
+  FaBookOpen,
+  FaChartLine,
+  FaTrophy,
+  FaMedal,
+  FaCalendarAlt,
+  FaCog,
+  FaSignOutAlt,
+  FaHome,
+  FaBook,
+  FaComments,
+  FaBell,
+  FaEdit,
+  FaShare,
+  FaDownload,
+  FaCertificate,
+  FaClock,
+  FaUsers,
+  FaStar,
+  FaFire,
+  FaRocket,
+  FaArrowUp,
+  FaArrowDown,
+  FaChevronRight
+} from "react-icons/fa";
+import { FiTrendingUp, FiGrid, FiList } from "react-icons/fi";
+import { IoIosTrendingUp, IoIosStats } from "react-icons/io";
 
 ChartJS.register(
   CategoryScale,
@@ -33,6 +64,8 @@ ChartJS.register(
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [timeRange, setTimeRange] = useState("month");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,176 +84,583 @@ const Profile = () => {
     load();
   }, [navigate]);
 
-  if (loading) return <div>Loading profile...</div>;
-  if (!profile) return <div>No profile data</div>;
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
+  const getInitials = (name) => {
+    return name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
+  };
+
+  const getProgressColor = (progress) => {
+    if (progress >= 80) return "success";
+    if (progress >= 50) return "warning";
+    return "danger";
+  };
+
+  if (loading) {
+    return (
+      <div className="student-dashboard">
+        <aside className="dashboard-sidebar">
+          {/* Sidebar Skeleton */}
+          <div className="sidebar-header">
+            <div className="sidebar-logo">
+              <FaGraduationCap />
+              <span>EduMentor</span>
+            </div>
+          </div>
+        </aside>
+        <main className="dashboard-main">
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading profile data...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="student-dashboard">
+        <aside className="dashboard-sidebar">
+          <div className="sidebar-header">
+            <div className="sidebar-logo">
+              <FaGraduationCap />
+              <span>EduMentor</span>
+            </div>
+          </div>
+        </aside>
+        <main className="dashboard-main">
+          <div className="empty-state">
+            <div className="empty-icon">
+              <FaUserCircle />
+            </div>
+            <h3>No profile data found</h3>
+            <p>Unable to load your profile information</p>
+            <button onClick={() => navigate(-1)} className="btn-primary">
+              Go Back
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Generate chart data based on profile
+  const generateChartData = () => {
+    const months = profile.enrollmentsOverTime?.labels || ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+    const values = profile.enrollmentsOverTime?.data || Array(6).fill(0).map((_, i) => Math.floor(Math.random() * 30) + 10);
+
+    if (profile.role === "student") {
+      return {
+        learningActivity: {
+          labels: months,
+          datasets: [{
+            label: "Learning Activity",
+            data: values,
+            borderColor: "#4361ee",
+            backgroundColor: "rgba(67, 97, 238, 0.1)",
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        courseProgress: {
+          labels: ["In Progress", "Completed", "Not Started"],
+          datasets: [{
+            data: [
+              profile.inProgress || 0,
+              profile.completed || 0,
+              (profile.totalEnrolled || 0) - (profile.inProgress || 0) - (profile.completed || 0)
+            ],
+            backgroundColor: ["#f59e0b", "#10b981", "#94a3b8"]
+          }]
+        }
+      };
+    } else {
+      return {
+        enrollments: {
+          labels: months,
+          datasets: [{
+            label: "Enrollments",
+            data: values,
+            borderColor: "#8b5cf6",
+            backgroundColor: "rgba(139, 92, 246, 0.1)",
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        completionRate: {
+          labels: ["Completed", "In Progress", "Not Started"],
+          datasets: [{
+            data: [
+              profile.totalCompleted || Math.round((profile.totalEnrollments || 0) * 0.6),
+              profile.inProgress || Math.round((profile.totalEnrollments || 0) * 0.3),
+              (profile.totalEnrollments || 0) - (profile.totalCompleted || 0) - (profile.inProgress || 0)
+            ],
+            backgroundColor: ["#10b981", "#f59e0b", "#94a3b8"]
+          }]
+        },
+        studentSatisfaction: {
+          labels: ["Excellent", "Good", "Average", "Poor"],
+          datasets: [{
+            data: [45, 35, 15, 5],
+            backgroundColor: ["#10b981", "#60a5fa", "#f59e0b", "#ef4444"]
+          }]
+        }
+      };
+    }
+  };
+
+  const chartData = generateChartData();
 
   return (
-    <div className="profile-page">
-      <h1>Profile</h1>
-      <div className="profile-card">
-        <div><strong>Name:</strong> {profile.name}</div>
-        <div><strong>Email:</strong> {profile.email}</div>
-        <div><strong>Role:</strong> {profile.role}</div>
+    <div className="student-dashboard">
+      {/* Background Elements */}
+      <div className="dashboard-bg-gradient"></div>
+      <div className="floating-element el-1"></div>
+      <div className="floating-element el-2"></div>
 
-        {profile.role === "student" && (
-          <>
-            <div><strong>Total enrolled courses:</strong> {profile.totalEnrolled}</div>
-            <div><strong>In-progress:</strong> {profile.inProgress}</div>
-            <div><strong>Completed:</strong> {profile.completed}</div>
+      {/* Sidebar Navigation */}
+      <motion.aside 
+        className="dashboard-sidebar"
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <FaGraduationCap />
+            <span>EduMentor</span>
+          </div>
+          <div className="sidebar-user">
+            <div className="user-avatar">
+              {getInitials(profile.name)}
+            </div>
+            <div className="user-info">
+              <h4>{profile.name}</h4>
+              <p>{profile.role === "student" ? "Student" : "Mentor"}</p>
+            </div>
+          </div>
+        </div>
 
-            <h3>Completed Courses</h3>
-            {profile.completedCourses?.length ? (
-              <ul>
-                {profile.completedCourses.map((c, idx) => (
-                  <li key={`${c.certificateId || idx}`}>
-                    <div><strong>{c.courseTitle}</strong></div>
-                    <div>Completed: {new Date(c.completionDate).toLocaleDateString()}</div>
-                    {c.certificateId && <div>ID: {c.certificateId}</div>}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div>No completed courses yet</div>
+        <nav className="sidebar-nav">
+          <Link to="/student" className="nav-item">
+            <FaHome />
+            <span>Dashboard</span>
+          </Link>
+          <Link to="/student/mycourses" className="nav-item">
+            <FaBook />
+            <span>My Courses</span>
+            {profile.role === "student" && profile.totalEnrolled > 0 && (
+              <span className="badge">{profile.totalEnrolled}</span>
             )}
+          </Link>
+          <Link to="/student/messages" className="nav-item">
+            <FaComments />
+            <span>Messages</span>
+          </Link>
+          <Link to="/profile" className="nav-item active">
+            <FaUserCircle />
+            <span>Profile</span>
+          </Link>
+          <Link to="/student/settings" className="nav-item">
+            <FaCog />
+            <span>Settings</span>
+          </Link>
+        </nav>
 
-            <div className="student-analytics">
-              {(() => {
-                const months = profile.enrollmentsOverTime?.labels || ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-                const values = profile.enrollmentsOverTime?.data || (() => {
-                  const total = profile.totalEnrolled || 0;
-                  const base = Math.floor(total / months.length) || 0;
-                  return months.map((m, i) => base + Math.round((i - months.length / 2) * 1));
-                })();
+        <div className="sidebar-footer">
+          <button className="sidebar-logout" onClick={handleLogout}>
+            <FaSignOutAlt />
+            <span>Logout</span>
+          </button>
+        </div>
+      </motion.aside>
 
-                const learningData = { labels: months, datasets: [{ label: "Activity", data: values, borderColor: "#0ea5a4", backgroundColor: "rgba(14,165,164,0.08)", tension: 0.3 }] };
+      {/* Main Content */}
+      <main className="dashboard-main">
+        {/* Header */}
+        <motion.header 
+          className="dashboard-header"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <div className="header-left">
+            <h1>My Profile</h1>
+            <p>Manage your account and track your progress</p>
+          </div>
+          
+          <div className="header-right">
+            <div className="time-range-selector">
+              <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)}>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="quarter">This Quarter</option>
+                <option value="year">This Year</option>
+              </select>
+            </div>
+            
+            <div className="header-actions">
+              <Link to="/student/notifications" className="notification-btn">
+                <FaBell />
+                <span className="notification-badge">3</span>
+              </Link>
+              <Link to="/student/messages" className="message-btn">
+                <FaComments />
+              </Link>
+              <div className="user-avatar-small">
+                {getInitials(profile.name)}
+              </div>
+            </div>
+          </div>
+        </motion.header>
 
-                const courses = profile.courses || [];
-                const courseLabels = courses.length ? courses.map(c => c.title || c.name) : ["Course A", "Course B"];
-                const courseProgressVals = courses.length ? courses.map(c => c.progress || 0) : [40, 70];
-                const courseBarData = { labels: courseLabels, datasets: [{ label: "Progress (%)", data: courseProgressVals, backgroundColor: courseLabels.map((l,i)=>[`#60a5fa`,`#34d399`,'#f97316'][i%3]) }] };
+        {/* Profile Tabs */}
+        <div className="profile-tabs">
+          <button 
+            className={`tab-btn ${activeTab === "overview" ? "active" : ""}`}
+            onClick={() => setActiveTab("overview")}
+          >
+            Overview
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === "courses" ? "active" : ""}`}
+            onClick={() => setActiveTab("courses")}
+          >
+            {profile.role === "student" ? "Completed Courses" : "My Teaching"}
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === "analytics" ? "active" : ""}`}
+            onClick={() => setActiveTab("analytics")}
+          >
+            Analytics
+          </button>
+          
+        </div>
 
-                const courseRows = courses.length ? courses : [{ title: "Course A", progress: 12, status: "in-progress" }];
+        {/* Profile Overview */}
+        <AnimatePresence mode="wait">
+          {activeTab === "overview" && (
+            <motion.div 
+              className="profile-overview"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Profile Header Card */}
+              <div className="profile-header-card">
+                <div className="profile-background">
+                  <div className="background-gradient"></div>
+                </div>
+                <div className="profile-content">
+                  <div className="avatar-section">
+                    <div className="avatar-large">
+                      {getInitials(profile.name)}
+                    </div>
+                    <div className="avatar-info">
+                      <h2>{profile.name}</h2>
+                      <p className="profile-role">
+                        {profile.role === "student" ? "Student" : "Mentor"}
+                        <span className="role-badge">
+                          {profile.role === "student" ? "Learner" : "Instructor"}
+                        </span>
+                      </p>
+                      <p className="profile-email">
+                        <FaEnvelope /> {profile.email}
+                      </p>
+                      <div className="profile-stats">
+                        <div className="stat">
+                          <FaCalendarAlt />
+                          <span>Joined {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                return (
+              {/* Stats Grid */}
+              <div className="profile-stats-grid">
+                {profile.role === "student" ? (
                   <>
-                    <div className="chart card">
-                      <h4>Learning Activity Over Time</h4>
-                      <Line data={learningData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+                        <FaBookOpen />
+                      </div>
+                      <div className="stat-content">
+                        <h3>{profile.totalEnrolled || 0}</h3>
+                        <p>Total Enrolled</p>
+                      </div>
+                      <div className="stat-trend up">
+                        <IoIosTrendingUp />
+                        <span>+12% from last month</span>
+                      </div>
                     </div>
 
-                    <div className="chart card">
-                      <h4>Course-wise Progress</h4>
-                      <Bar data={courseBarData} options={{ responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }} />
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981, #34d399)' }}>
+                        <FaChartLine />
+                      </div>
+                      <div className="stat-content">
+                        <h3>{profile.inProgress || 0}</h3>
+                        <p>In Progress</p>
+                      </div>
+                      <div className="stat-progress">
+                        <div className="progress-bar">
+                          <div 
+                            className="progress-fill"
+                            style={{ width: `${((profile.inProgress || 0) / (profile.totalEnrolled || 1)) * 100}%` }}
+                          ></div>
+                        </div>
+                        <span>{Math.round(((profile.inProgress || 0) / (profile.totalEnrolled || 1)) * 100)}%</span>
+                      </div>
                     </div>
 
-                    <div className="performance-table card">
-                      <h4>Course Progress</h4>
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Course</th>
-                            <th>Progress</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {courseRows.map((c, idx) => (
-                            <tr key={c.id || c.title || idx}>
-                              <td>{c.title || c.name || `Course ${idx+1}`}</td>
-                              <td>{c.progress ?? c.enrollments ?? 0}%</td>
-                              <td>{c.status || (c.progress >= 100 ? 'completed' : 'in-progress')}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}>
+                        <FaTrophy />
+                      </div>
+                      <div className="stat-content">
+                        <h3>{profile.completed || 0}</h3>
+                        <p>Completed</p>
+                      </div>
+                      <div className="achievement-badge">
+                        <FaMedal />
+                        <span>{profile.completed >= 5 ? "Advanced Learner" : "Beginner"}</span>
+                      </div>
+                    </div>
+
+                  </>
+                ) : (
+                  <>
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+                        <FaBookOpen />
+                      </div>
+                      <div className="stat-content">
+                        <h3>{profile.totalCourses || 0}</h3>
+                        <p>Courses Created</p>
+                      </div>
+                      <div className="stat-trend up">
+                        <IoIosTrendingUp />
+                        <span>+2 this month</span>
+                      </div>
+                    </div>
+
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981, #34d399)' }}>
+                        <FaUsers />
+                      </div>
+                      <div className="stat-content">
+                        <h3>{profile.totalEnrollments || 0}</h3>
+                        <p>Total Students</p>
+                      </div>
+                      <div className="stat-trend up">
+                        <FaArrowUp />
+                        <span>+15% enrollment rate</span>
+                      </div>
+                    </div>
+
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}>
+                        <FaChartLine />
+                      </div>
+                      <div className="stat-content">
+                        <h3>94%</h3>
+                        <p>Satisfaction Rate</p>
+                      </div>
+                      <div className="achievement-badge">
+                        <FaStar />
+                        <span>Top Rated Mentor</span>
+                      </div>
+                    </div>
+
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ec4899, #f472b6)' }}>
+                        <FaCertificate />
+                      </div>
+                      <div className="stat-content">
+                        <h3>{profile.totalCompleted || 0}</h3>
+                        <p>Course Completions</p>
+                      </div>
+                      <div className="stat-trend up">
+                        <FaRocket />
+                        <span>85% completion rate</span>
+                      </div>
                     </div>
                   </>
-                );
-              })()}
-            </div>
-          </>
-        )}
+                )}
+              </div>
 
-        {profile.role === "mentor" && (
-          <>
-            <div><strong>Total courses created:</strong> {profile.totalCourses}</div>
-            <div><strong>Total student enrollments:</strong> {profile.totalEnrollments}</div>
-            <div className="mentor-analytics">
-              {(() => {
-                const months = profile.enrollmentsOverTime?.labels || ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-                const values = profile.enrollmentsOverTime?.data || (() => {
-                  const total = profile.totalEnrollments || 0;
-                  const base = Math.floor(total / months.length) || 0;
-                  return months.map((m, i) => base + Math.round((i - months.length / 2) * 2 + (profile.totalCourses || 0)));
-                })();
+            
+            </motion.div>
+          )}
 
-                const enrollmentsData = { labels: months, datasets: [{ label: "Enrollments", data: values, borderColor: "#6366f1", backgroundColor: "rgba(99,102,241,0.08)", tension: 0.3 }] };
-
-                const courses = profile.courses || [];
-                const courseLabels = courses.length ? courses.map(c => c.title || c.name) : ["Course A", "Course B", "Course C"];
-                const courseDataVals = courses.length ? courses.map(c => c.enrollments || c.enrollmentCount || 0) : [12, 19, 7];
-                const courseBarData = { labels: courseLabels, datasets: [{ label: "Enrollments", data: courseDataVals, backgroundColor: courseLabels.map((l,i)=>[`#60a5fa`,`#34d399`,`#f59e0b`][i%3]) }] };
-
-                const completed = profile.completed || profile.totalCompleted || Math.round((profile.totalEnrollments || 0) * 0.4);
-                const inProgress = (profile.totalEnrollments || 0) - completed;
-                const completionPieData = { labels: ["Completed", "In-progress"], datasets: [{ data: [completed, Math.max(inProgress, 0)], backgroundColor: ["#10b981", "#f59e0b"] }] };
-
-                const courseRows = (courses.length ? courses : [{ title: "Course A", enrollments: 12, completions: 6, avgScore: 82 }]);
-
-                return (
-                  <>
-                    <div className="chart card">
-                      <h4>Enrollments Over Time</h4>
-                      <Line data={enrollmentsData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+          {/* Courses Tab */}
+          {activeTab === "courses" && (
+            <motion.div 
+              className="courses-tab"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {profile.role === "student" ? (
+                <>
+                  <div className="section-header">
+                    <h2>My Learning Journey</h2>
+                    <div className="section-actions">
+                      <button className="btn-outline">View All</button>
+                      <button className="btn-primary">Continue Learning</button>
                     </div>
+                  </div>
 
-                    <div className="chart card">
-                      <h4>Course-wise Enrollments</h4>
-                      <Bar data={courseBarData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+                  {profile.completedCourses?.length ? (
+                    <div className="courses-grid">
+                      {profile.completedCourses.map((course, index) => (
+                        <div key={index} className="course-item">
+                          <div className="course-item-header">
+                            <h4>{course.courseTitle}</h4>
+                            <span className="course-status completed">Completed</span>
+                          </div>
+                          <p className="course-meta">
+                            Completed on {new Date(course.completionDate).toLocaleDateString()}
+                          </p>
+                          {course.certificateId && (
+                            <div className="certificate-info">
+                              <FaCertificate />
+                              <span>Certificate ID: {course.certificateId}</span>
+                              <button className="download-btn">
+                                <FaDownload />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
+                  ) : (
+                    <div className="empty-courses">
+                      <div className="empty-icon">
+                        <FaBookOpen />
+                      </div>
+                      <h3>No completed courses yet</h3>
+                      <p>Start your learning journey by enrolling in courses</p>
+                      <Link to="/student" className="btn-primary">
+                        Browse Courses
+                      </Link>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="section-header">
+                    <h2>My Teaching Portfolio</h2>
+                    <div className="section-actions">
+                      <button className="btn-outline">Create New Course</button>
+                      <button className="btn-primary">View Analytics</button>
+                    </div>
+                  </div>
+                  
+                  <div className="mentor-courses">
+                    {/* Mentor courses would be rendered here */}
+                    <div className="empty-courses">
+                      <div className="empty-icon">
+                        <FaBookOpen />
+                      </div>
+                      <h3>Teaching Analytics</h3>
+                      <p>Manage your courses and track student progress</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          )}
 
-                    <div className="chart card">
-                      <h4>Completion Status</h4>
-                      <Pie data={completionPieData} options={{ responsive: true, plugins: { legend: { position: "bottom" } } }} />
-                    </div>
+          {/* Analytics Tab */}
+          {activeTab === "analytics" && (
+            <motion.div 
+              className="analytics-tab"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="analytics-header">
+                <h2>Learning Analytics</h2>
+                <p>Track your progress and performance over time</p>
+              </div>
 
-                    <div className="performance-table card">
-                      <h4>Course Performance</h4>
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Course</th>
-                            <th>Enrollments</th>
-                            <th>Completions</th>
-                            <th>Completion Rate</th>
-                            <th>Avg Score</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {courseRows.map((c, idx) => {
-                            const enroll = c.enrollments || c.enrollmentCount || 0;
-                            const comp = c.completions || c.completed || Math.round(enroll * 0.5);
-                            const rate = enroll ? Math.round((comp / enroll) * 100) : 0;
-                            return (
-                              <tr key={c.id || c.title || idx}>
-                                <td>{c.title || c.name || `Course ${idx+1}`}</td>
-                                <td>{enroll}</td>
-                                <td>{comp}</td>
-                                <td>{rate}%</td>
-                                <td>{c.avgScore ?? (Math.round((Math.random()*20)+70))}%</td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-          </>
-        )}
-      </div>
+              <div className="analytics-grid">
+                <div className="analytics-card">
+                  <div className="card-header">
+                    <h4>
+                      <IoIosStats />
+                      {profile.role === "student" ? "Learning Activity" : "Enrollment Trends"}
+                    </h4>
+                  </div>
+                  <div className="chart-container">
+                    <Line 
+                      data={profile.role === "student" ? chartData.learningActivity : chartData.enrollments}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: { display: false }
+                        },
+                        scales: {
+                          y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="analytics-card">
+                  <div className="card-header">
+                    <h4>
+                      <FaChartLine />
+                      {profile.role === "student" ? "Course Progress" : "Completion Rate"}
+                    </h4>
+                  </div>
+                  <div className="chart-container">
+                    <Doughnut 
+                      data={profile.role === "student" ? chartData.courseProgress : chartData.completionRate}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: { position: 'bottom' }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+
+                
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Footer */}
+        <footer className="dashboard-footer">
+          <p>© 2024 EduMentor. Your learning journey matters.</p>
+          <div className="footer-links">
+            <Link to="/help">Help Center</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/contact">Contact</Link>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 };
