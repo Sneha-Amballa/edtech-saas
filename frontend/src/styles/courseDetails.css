@@ -582,7 +582,7 @@
 
 .enroll-btn {
   width: calc(100% - 64px);
-  margin: 0 32px 24px;
+  margin: 0 32px 16px;
   padding: 18px;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
@@ -600,6 +600,32 @@
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+}
+
+.doubt-btn {
+  width: calc(100% - 64px);
+  margin: 0 32px 24px;
+  padding: 16px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.doubt-btn:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
 }
 
 .status-badge {

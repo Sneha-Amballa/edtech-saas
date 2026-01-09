@@ -15,11 +15,13 @@ import {
   FaChartLine,
   FaArrowLeft,
   FaUserCircle,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaComments
 } from "react-icons/fa";
 import { FiTrendingUp, FiBook } from "react-icons/fi";
 import "../styles/courseDetails.css";
 import { enrollInCourse, getMyCourses, markLessonComplete as markLessonCompleteService } from "../services/enrollmentService";
+import ChatModal from "../components/ChatModal";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -33,6 +35,7 @@ const CourseDetails = () => {
   const [user, setUser] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [status, setStatus] = useState(null);
+  const [showChat, setShowChat] = useState(false);
 
   /* -------------------------------- LOAD COURSE -------------------------------- */
   useEffect(() => {
@@ -161,6 +164,14 @@ const handleEnroll = async () => {
 
   return (
     <div className="course-details-container">
+      {showChat && (
+        <ChatModal
+          courseId={id}
+          mentorName={course?.instructor?.name || "Mentor"}
+          onClose={() => setShowChat(false)}
+        />
+      )}
+
       {/* HEADER */}
       <header className="course-header">
         <div className="header-left">
@@ -320,6 +331,15 @@ const handleEnroll = async () => {
                 }}
               >
                 Continue Learning
+              </button>
+            )}
+
+            {isEnrolled && (
+              <button
+                className="doubt-btn"
+                onClick={() => setShowChat(true)}
+              >
+                <FaComments /> Ask Mentor Doubt
               </button>
             )}
 

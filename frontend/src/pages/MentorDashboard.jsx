@@ -4,7 +4,7 @@ import { getMyCourses, publishCourse } from "../services/courseService";
 import "../styles/mentorDashboard.css";
 
 // Import icons (assuming you're using react-icons)
-import { FaGraduationCap, FaBookOpen, FaUsers, FaEdit, FaEye, FaRocket, FaPlus, FaCheckCircle, FaStar, FaBook, FaChartLine, FaRegClock } from "react-icons/fa";
+import { FaGraduationCap, FaBookOpen, FaUsers, FaEdit, FaEye, FaRocket, FaPlus, FaCheckCircle, FaStar, FaBook, FaChartLine, FaRegClock, FaComments } from "react-icons/fa";
 import { FiBook, FiUsers, FiTrendingUp } from "react-icons/fi";
 
 const MentorDashboard = () => {
@@ -103,7 +103,10 @@ const MentorDashboard = () => {
 
         {/* Stats Cards */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ marginLeft: "auto" }}>
+          <div style={{ marginLeft: "auto", display: "flex", gap: 12 }}>
+            <Link to="/mentor/messages" className="messages-btn">
+              <FaComments /> Messages
+            </Link>
             <Link to="/profile" className="profile-btn">
               View Profile
             </Link>

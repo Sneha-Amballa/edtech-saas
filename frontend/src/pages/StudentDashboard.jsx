@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getPublishedCourses } from "../services/courseService";
 import "../styles/studentDashboard.css";
 import { enrollInCourse, getMyCourses, getCounts } from "../services/enrollmentService";
+import axios from "axios";
 
 // Icons
 import { 
@@ -19,7 +20,8 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaThLarge,
-  FaList
+  FaList,
+  FaComments
 } from "react-icons/fa";
 import { FiBook, FiTrendingUp } from "react-icons/fi";
 const StudentDashboard = () => {
@@ -34,6 +36,7 @@ const StudentDashboard = () => {
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
   const [sortOption, setSortOption] = useState("recommended");
   const [user, setUser] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,7 +46,35 @@ const StudentDashboard = () => {
     // Load both courses and enrollments on mount
     loadCourses();
     loadEnrollments();
+    loadMessageCount();
   }, []);
+
+  const loadMessageCount = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await axios.get(`${API_BASE_URL}/api/chat/student/all-chats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Count total unread messages (messages from mentors)
+      let totalMessages = 0;
+      const chats = res.data.chats || [];
+      chats.forEach((courseGroup) => {
+        courseGroup.chats?.forEach((chat) => {
+          if (chat.lastMessage && chat.lastMessage.sender?.role === "mentor") {
+            totalMessages += 1;
+          }
+        });
+      });
+
+      setUnreadCount(totalMessages);
+    } catch (error) {
+      console.error("Failed to load message count:", error);
+    }
+  };
 
   const loadCourses = async () => {
     try {
@@ -160,6 +191,10 @@ const loadEnrollments = async () => {
               <span className="user-role">Student</span>
             </div>
           </div>
+          <Link to="/student/messages" className="messages-btn">
+            <FaComments /> Messages
+            {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
+          </Link>
           <Link to="/profile" className="profile-btn">
             Profile
           </Link>

@@ -7,6 +7,7 @@ import Courses from "./pages/Courses";
 
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentCourseDetails from "./pages/CourseDetails";
+import StudentMessages from "./pages/StudentMessages";
 import Profile from "./pages/Profile";
 import Certificate from "./pages/Certificate";
 
@@ -14,6 +15,7 @@ import MentorDashboard from "./pages/MentorDashboard";
 import CreateCourse from "./pages/CreateCourse";
 import ManageCourse from "./pages/ManageCourse";
 import MentorCoursePreview from "./pages/MentorCoursePreview";
+import MentorMessages from "./pages/MentorMessages";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -52,6 +54,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/messages"
+          element={
+            <ProtectedRoute role="student">
+              <StudentMessages />
             </ProtectedRoute>
           }
         />
@@ -98,6 +109,15 @@ function App() {
           element={
             <ProtectedRoute role="mentor">
               <MentorCoursePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/mentor/messages"
+          element={
+            <ProtectedRoute role="mentor">
+              <MentorMessages />
             </ProtectedRoute>
           }
         />
