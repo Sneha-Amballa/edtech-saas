@@ -36,3 +36,13 @@ export const getCounts = () => {
 export const getCertificate = (courseId) => {
   return axios.get(`${API}/${courseId}/certificate`, getAuthConfig());
 };
+
+// 💳 Create payment order
+export const createPaymentOrder = (courseId) => {
+  return axios.post(`${API}/checkout/${courseId}`, {}, getAuthConfig());
+};
+
+// ✅ Verify payment and enroll
+export const verifyPayment = (courseId, paymentData) => {
+  return axios.post(`${API}/verify/${courseId}`, paymentData, getAuthConfig());
+};

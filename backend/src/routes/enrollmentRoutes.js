@@ -5,6 +5,8 @@ const {
   markLessonComplete,
   getCounts,
   getCertificate,
+  createPaymentOrder,
+  verifyPayment
 } = require("../controllers/enrollmentController");
 const { protect } = require("../middlewares/authMiddleware");
 
@@ -19,6 +21,10 @@ router.get("/counts", protect, getCounts);
 
 /* Certificate */
 router.get("/:courseId/certificate", protect, getCertificate);
+
+/* Payment Routes */
+router.post("/checkout/:courseId", protect, createPaymentOrder);
+router.post("/verify/:courseId", protect, verifyPayment);
 
 /* Student enrolls in a course */
 router.post("/:courseId", protect, enrollInCourse);

@@ -34,7 +34,7 @@ import {
 import { FiTrendingUp, FiBook, FiCalendar, FiBarChart2 } from "react-icons/fi";
 import { GiDuration } from "react-icons/gi";
 import "../styles/courseDetails.css";
-import { enrollInCourse, getMyCourses, markLessonComplete as markLessonCompleteService } from "../services/enrollmentService";
+import { enrollInCourse, getMyCourses, markLessonComplete as markLessonCompleteService, createPaymentOrder, verifyPayment } from "../services/enrollmentService";
 import ChatModal from "../components/ChatModal";
 
 const CourseDetails = () => {
@@ -143,16 +143,92 @@ const CourseDetails = () => {
     }
   };
 
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
   const handleEnroll = async () => {
+    // If course is free or 0
+    if (!course.price || course.price === 0) {
+      try {
+        const res = await enrollInCourse(id);
+        const enrollment = res.data?.enrollment;
+        alert("Enrolled successfully!");
+        setIsEnrolled(true);
+        setCompletedLessons(enrollment?.completedLessons || []);
+        setProgress(enrollment?.progress || 0);
+      } catch (err) {
+        alert(err.response?.data?.message || "Enrollment failed");
+      }
+      return;
+    }
+
+    // Paid Course Logic
+    const res = await loadRazorpay();
+    if (!res) {
+      alert("Razorpay SDK failed to load. Please check your connection.");
+      return;
+    }
+
     try {
-      const res = await enrollInCourse(id);
-      const enrollment = res.data?.enrollment;
-      alert("Enrolled successfully!");
-      setIsEnrolled(true);
-      setCompletedLessons(enrollment?.completedLessons || []);
-      setProgress(enrollment?.progress || 0);
+      // 1. Create Order
+      const { data } = await createPaymentOrder(id);
+
+      // 2. Open Razorpay
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
+        name: "EdTech Platform",
+        description: data.course.title,
+        order_id: data.orderId,
+        handler: async function (response) {
+          try {
+            // 3. Verify Payment
+            const verifyRes = await verifyPayment(id, {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            });
+
+            alert("Payment Successful! You are now enrolled.");
+            setIsEnrolled(true);
+            // Optionally refresh enrollment data
+            checkEnrollment();
+          } catch (err) {
+            console.error(err);
+            alert("Payment verification failed. Please contact support if money was deducted.");
+          }
+        },
+        prefill: {
+          name: data.user.name,
+          email: data.user.email,
+          contact: data.user.contact
+        },
+        theme: {
+          color: "#3399cc"
+        }
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.on("payment.failed", function (response) {
+        alert(response.error.description || "Payment failed");
+      });
+      rzp1.open();
+
     } catch (err) {
-      alert(err.response?.data?.message || "Enrollment failed");
+      console.error(err);
+      alert(err.response?.data?.message || "Could not initiate payment");
     }
   };
 
@@ -220,7 +296,7 @@ const CourseDetails = () => {
             </div>
             <h1 className="course-title">{course.title}</h1>
             <p className="course-description">{course.description}</p>
-            
+
             <div className="hero-meta">
               <div className="meta-item">
                 <FiBarChart2 className="meta-icon" />
@@ -249,7 +325,7 @@ const CourseDetails = () => {
                 <div className="original-price">₹{course.originalPrice}</div>
               )}
             </div>
-            
+
             {!isEnrolled ? (
               <button className="enroll-btn primary" onClick={handleEnroll}>
                 <FaGraduationCap /> Enroll Now
@@ -271,7 +347,7 @@ const CourseDetails = () => {
                 <FaPlay /> Continue Learning
               </button>
             )}
-            
+
             <div className="action-features">
               <div className="feature">
                 <FaVideo /> 30-Day Money-Back Guarantee
@@ -321,7 +397,7 @@ const CourseDetails = () => {
                 <h3><FaBookOpen /> Course Curriculum</h3>
                 <span className="lessons-count">{course.lessons.length} lessons</span>
               </div>
-              
+
               <div className="lessons-list">
                 {course.lessons.map((lesson, index) => {
                   const canAccess = lesson.isFree || isEnrolled;
@@ -344,7 +420,7 @@ const CourseDetails = () => {
                             <div className="lesson-number">{index + 1}</div>
                           )}
                         </div>
-                        
+
                         <div className="lesson-info">
                           <div className="lesson-title-row">
                             <h4>{lesson.title}</h4>
@@ -364,7 +440,7 @@ const CourseDetails = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="lesson-actions">
                           {canAccess ? (
                             <button className="expand-btn">

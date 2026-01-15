@@ -1,6 +1,12 @@
 const Enrollment = require("../models/Enrollment");
 const Course = require("../models/Course");
 const crypto = require("crypto");
+const Razorpay = require("razorpay");
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 /* ---------------- ENROLL STUDENT ---------------- */
 exports.enrollInCourse = async (req, res) => {
@@ -24,27 +30,139 @@ exports.enrollInCourse = async (req, res) => {
         .json({ message: "Already enrolled in this course" });
     }
 
-    const enrollment = await Enrollment.create({
-      student: studentId,
-      course: courseId,
-      completedLessons: [],
-      status: "in-progress",
-      progress: 0,
-    });
+    // If course is free, enroll directly
+    if (course.price === 0) {
+      const enrollment = await Enrollment.create({
+        student: studentId,
+        course: courseId,
+        completedLessons: [],
+        status: "in-progress",
+        progress: 0,
+      });
 
-    course.enrolledCount += 1;
-    await course.save();
+      course.enrolledCount += 1;
+      await course.save();
 
-    res.status(201).json({
-      message: "Enrolled successfully",
-      enrollment,
-      enrolledCount: course.enrolledCount,
-    });
+      return res.status(201).json({
+        message: "Enrolled successfully",
+        enrollment,
+        enrolledCount: course.enrolledCount,
+      });
+    }
+
+    return res.status(400).json({ message: "Course requires payment" });
+
   } catch (error) {
     res.status(500).json({ message: "Enrollment failed" });
   }
 };
 
+
+/* ---------------- CREATE PAYMENT ORDER ---------------- */
+exports.createPaymentOrder = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const studentId = req.user._id;
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Check if already enrolled
+    const alreadyEnrolled = await Enrollment.findOne({
+      student: studentId,
+      course: courseId,
+    });
+
+    if (alreadyEnrolled) {
+      return res.status(400).json({ message: "Already enrolled in this course" });
+    }
+
+    const options = {
+      amount: Math.round(course.price * 100), // amount in lowest currency unit
+      currency: "INR",
+      receipt: `receipt_${courseId}_${studentId.toString().slice(-4)}`,
+    };
+
+    const order = await razorpay.orders.create(options);
+
+    res.json({
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      key: process.env.RAZORPAY_KEY_ID, // Send key to frontend
+      course: {
+        title: course.title,
+        description: course.description
+      },
+      user: {
+        name: req.user.name,
+        email: req.user.email,
+        contact: req.user.phone || ""
+      }
+    });
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).json({ message: "Could not create payment order" });
+  }
+};
+
+/* ---------------- VERIFY PAYMENT & ENROLL ---------------- */
+exports.verifyPayment = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const studentId = req.user._id;
+
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body.toString())
+      .digest("hex");
+
+    const isAuthentic = expectedSignature === razorpay_signature;
+
+    if (isAuthentic) {
+      // Payment success, enroll student
+      const course = await Course.findById(courseId);
+
+      // Double check enrollment just in case
+      const alreadyEnrolled = await Enrollment.findOne({
+        student: studentId,
+        course: courseId,
+      });
+
+      if (alreadyEnrolled) {
+        return res.status(200).json({ message: "Payment verified, already enrolled", enrollment: alreadyEnrolled });
+      }
+
+      const enrollment = await Enrollment.create({
+        student: studentId,
+        course: courseId,
+        completedLessons: [],
+        status: "in-progress",
+        progress: 0,
+        paymentId: razorpay_payment_id, // Store payment ID if you added field to model (optional but good)
+        orderId: razorpay_order_id
+      });
+
+      course.enrolledCount += 1;
+      await course.save();
+
+      res.status(201).json({
+        message: "Payment verified and Enrolled successfully",
+        enrollment,
+      });
+    } else {
+      res.status(400).json({ message: "Payment verification failed" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 
 /* ---------------- MARK LESSON COMPLETE ---------------- */
@@ -130,8 +248,6 @@ exports.markLessonComplete = async (req, res) => {
 };
 
 
-
-
 /* ---------------- MY COURSES (STUDENT) ---------------- */
 exports.getMyCourses = async (req, res) => {
   try {
@@ -142,7 +258,7 @@ exports.getMyCourses = async (req, res) => {
       .lean();
 
     const formatted = enrollments.map((e) => {
-      const totalLessons = e.course.lessons.length;
+      const totalLessons = e.course.lessons?.length || 0;
       const completedLessonsArray = e.completedLessons || [];
       const completedLessonsCount = completedLessonsArray.length;
 
@@ -208,4 +324,5 @@ exports.getCertificate = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch certificate" });
   }
 };
+
 
