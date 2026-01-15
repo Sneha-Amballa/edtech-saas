@@ -96,7 +96,7 @@ const Home = () => {
           <nav className="header-nav">
             <div className="nav-main">
               <div className="nav-item-wrapper" style={{ position: "relative" }}>
-                <button 
+                <button
                   onClick={toggleCoursesDropdown}
                   className="nav-link"
                   style={{ background: "none", border: "none", cursor: "pointer" }}
@@ -104,7 +104,7 @@ const Home = () => {
                   <span>Courses</span>
                   <div className="nav-indicator"></div>
                 </button>
-                
+
                 {/* Courses Dropdown */}
                 {showCoursesDropdown && (
                   <div className="courses-dropdown">
@@ -123,7 +123,7 @@ const Home = () => {
                               <span>{course.duration}</span>
                             </div>
                           </div>
-                          <button 
+                          <button
                             onClick={handleEnroll}
                             className="dropdown-course-btn"
                           >
@@ -131,7 +131,7 @@ const Home = () => {
                           </button>
                         </div>
                       ))}
-                      <button 
+                      <button
                         onClick={() => {
                           setShowCoursesDropdown(false);
                           handleCourseAccess("/courses");
@@ -144,7 +144,7 @@ const Home = () => {
                   </div>
                 )}
               </div>
-              
+
               <Link to="/mentors" className="nav-link">
                 <span>Mentors</span>
                 <div className="nav-indicator"></div>
@@ -205,7 +205,7 @@ const Home = () => {
               transition={{ duration: 0.7, delay: 0.2 }}
               className="hero-description"
             >
-              Join 50,000+ professionals in live, interactive learning experiences 
+              Join 50,000+ professionals in live, interactive learning experiences
               with personalized mentorship from top industry experts.
             </motion.p>
 
@@ -215,7 +215,7 @@ const Home = () => {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="hero-actions"
             >
-              <button 
+              <button
                 onClick={() => handleCourseAccess("/courses")}
                 className="btn-primary btn-large"
                 style={{ background: "var(--gradient-primary)", border: "none", cursor: "pointer" }}
@@ -300,7 +300,7 @@ const Home = () => {
       {/* Stats Section */}
       <section className="stats-section">
         <div className="stats-container">
-          <div className="stat-card">
+          <div className="stat-card stat-mentors">
             <div className="stat-icon">
               <FaUsers />
             </div>
@@ -309,7 +309,7 @@ const Home = () => {
               <p>Expert Mentors</p>
             </div>
           </div>
-          <div className="stat-card">
+          <div className="stat-card stat-courses">
             <div className="stat-icon">
               <MdOutlineLiveTv />
             </div>
@@ -318,7 +318,7 @@ const Home = () => {
               <p>Live Courses</p>
             </div>
           </div>
-          <div className="stat-card">
+          <div className="stat-card stat-career">
             <div className="stat-icon">
               <FaBriefcase />
             </div>
@@ -327,7 +327,7 @@ const Home = () => {
               <p>Career Advancement</p>
             </div>
           </div>
-          <div className="stat-card">
+          <div className="stat-card stat-satisfaction">
             <div className="stat-icon">
               <FaCertificate />
             </div>
@@ -344,7 +344,7 @@ const Home = () => {
         <div className="section-header">
           <h2 className="section-title">Most Popular Courses</h2>
           <p className="section-subtitle">Hands-on learning with industry experts</p>
-          <button 
+          <button
             onClick={() => handleCourseAccess("/courses")}
             className="section-link"
             style={{ background: "none", border: "none", cursor: "pointer", color: "var(--primary)", display: "flex", alignItems: "center", gap: "0.5rem" }}
@@ -370,7 +370,7 @@ const Home = () => {
               </div>
               <div className="course-footer">
                 <span className="course-price">From $499</span>
-                <button 
+                <button
                   onClick={handleEnroll}
                   className="btn-outline"
                   style={{ padding: "0.625rem 1.25rem", borderRadius: "6px", border: "1.5px solid var(--gray-300)", background: "transparent", color: "var(--gray-700)", fontWeight: "500", cursor: "pointer", transition: "all 0.2s ease" }}
@@ -390,7 +390,7 @@ const Home = () => {
         <div className="works-container">
           <h2 className="section-title">How It Works</h2>
           <p className="section-subtitle">Start your learning journey in three simple steps</p>
-          
+
           <div className="steps-grid">
             <div className="step-card">
               <div className="step-number">01</div>
@@ -430,7 +430,9 @@ const Home = () => {
         <div className="mentors-grid">
           {mentors.map((mentor, index) => (
             <div key={index} className="mentor-card">
-              <div className="mentor-avatar-large"></div>
+              <div className="mentor-avatar-large">
+                <FaUser style={{ color: "white", fontSize: "2rem" }} />
+              </div>
               <div className="mentor-info">
                 <h3>{mentor.name}</h3>
                 <p className="mentor-role">{mentor.role}</p>
@@ -453,7 +455,7 @@ const Home = () => {
             <h2>Ready to Transform Your Career?</h2>
             <p>Join thousands of professionals who have accelerated their growth with EduMentor</p>
             <div className="cta-actions">
-              <button 
+              <button
                 onClick={handleEnroll}
                 className="btn-primary btn-large"
                 style={{ background: "var(--gradient-primary)", border: "none", cursor: "pointer" }}

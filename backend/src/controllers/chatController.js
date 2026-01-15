@@ -1,6 +1,7 @@
 const Chat = require("../models/Chat");
 const Enrollment = require("../models/Enrollment");
 const Course = require("../models/Course");
+const cloudinary = require("../cloudinary");
 
 // Get or create a chat between student and mentor for a specific course
 exports.getOrCreateChat = async (req, res) => {
@@ -95,10 +96,29 @@ exports.sendMessage = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized access to chat" });
     }
 
+    const recipientId = chat.student.toString() === senderId.toString() ? chat.mentor.toString() : chat.student.toString();
+
+    // Check if recipient is online to set 'delivered'
+    const io = req.app.get("io");
+    let initialStatus = "sent";
+
+    if (io) {
+      // Check if recipient has joined their personal room
+      // Note: checking room size requires exact room name
+      const room = io.sockets.adapter.rooms.get(recipientId);
+      if (room && room.size > 0) {
+        initialStatus = "delivered";
+      }
+    }
+
     // Add message
     const message = {
       sender: senderId,
       content: content.trim(),
+      type: req.body.type || "text",
+      fileUrl: req.body.fileUrl,
+      fileMetadata: req.body.fileMetadata,
+      status: initialStatus,
       createdAt: new Date(),
     };
 
@@ -108,6 +128,32 @@ exports.sendMessage = async (req, res) => {
     // Populate sender info for response
     await chat.populate("messages.sender", "name email");
     const addedMessage = chat.messages[chat.messages.length - 1];
+
+    if (io) {
+      // Emit to chat room (active viewers)
+      io.to(chatId).emit("receive_message", addedMessage);
+
+      // Emit to recipient's personal room (for global notification/badge)
+      io.to(recipientId).emit("incoming_message", {
+        message: addedMessage,
+        chatId: chatId
+      });
+
+      // If we auto-marked as delivered, notify sender immediately
+      if (initialStatus === 'delivered') {
+        io.to(senderId).emit("messages_delivered", {
+          chatId: chat._id,
+          userId: recipientId,
+          status: 'delivered'
+        });
+        // Also emit to chat room so sender sees it if open
+        io.to(chatId).emit("messages_delivered", {
+          chatId: chat._id,
+          userId: recipientId,
+          status: 'delivered'
+        });
+      }
+    }
 
     res.json({ message: addedMessage });
   } catch (err) {
@@ -173,6 +219,7 @@ exports.getMentorChats = async (req, res) => {
         student: chat.student,
         lastMessage: chat.messages[chat.messages.length - 1] || null,
         messageCount: chat.messages.length,
+        unreadCount: chat.messages.filter(m => m.sender.toString() !== mentorId.toString() && m.status !== 'read').length,
         createdAt: chat.createdAt,
       });
     });
@@ -239,6 +286,7 @@ exports.getAllStudentChats = async (req, res) => {
         mentor: chat.mentor,
         lastMessage: chat.messages[chat.messages.length - 1] || null,
         messageCount: chat.messages.length,
+        unreadCount: chat.messages.filter(m => m.sender.toString() !== studentId.toString() && m.status !== 'read').length,
         createdAt: chat.createdAt,
       });
     });
@@ -274,5 +322,86 @@ exports.getStudentChat = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to fetch chat" });
+  }
+};
+
+// Mark messages as read
+exports.markChatRead = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const userId = req.user._id;
+
+    const chat = await Chat.findById(chatId);
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
+    // Verify participant
+    if (chat.student.toString() !== userId.toString() && chat.mentor.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    let updatedCount = 0;
+    const now = new Date();
+
+    // Mark all messages from the *other* person as read
+    chat.messages.forEach(msg => {
+      // If I am NOT the sender, and it's not read, mark it read
+      if (msg.sender.toString() !== userId.toString() && msg.status !== 'read') {
+        msg.status = 'read';
+        msg.readAt = now;
+        updatedCount++;
+      }
+    });
+
+    if (updatedCount > 0) {
+      await chat.save();
+
+      // Notify the other user via socket that their messages were read
+      const io = req.app.get("io");
+      if (io) {
+        io.to(chatId).emit("messages_read", { chatId, readBy: userId, count: updatedCount });
+      }
+    }
+
+    res.json({ message: "Messages marked read", count: updatedCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to mark messages read" });
+  }
+};
+
+// Upload attachment
+exports.uploadAttachment = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // Convert buffer to base64 for Cloudinary upload
+    const b64 = Buffer.from(req.file.buffer).toString("base64");
+    let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+
+    // Determine resource type (image or raw for documents)
+    // Cloudinary auto-detects, but explicit is better for non-images
+    const resourceType = req.file.mimetype.startsWith("image/") ? "image" : "auto";
+
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: "chat_attachments",
+      resource_type: resourceType,
+      use_filename: true, // keep original filename in url if possible
+    });
+
+    res.json({
+      url: result.secure_url,
+      metadata: {
+        originalName: req.file.originalname,
+        size: req.file.size,
+        mimeType: req.file.mimetype,
+      },
+    });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ message: "Failed to upload file" });
   }
 };

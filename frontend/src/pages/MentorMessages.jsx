@@ -1,28 +1,86 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaArrowLeft, FaUserCircle, FaSignOutAlt, FaComments } from "react-icons/fa";
+import { FaArrowLeft, FaUserCircle, FaSignOutAlt, FaComments, FaSearch } from "react-icons/fa";
+import io from "socket.io-client";
 import ChatThread from "../components/ChatThread";
 import "../styles/mentorMessages.css";
 
 const MentorMessages = () => {
   const navigate = useNavigate();
   const [chats, setChats] = useState([]);
+  const [filteredChats, setFilteredChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [selectedChatId, setSelectedChatId] = useState(null);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const socketRef = useRef();
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user") || "{}");
-    setUser(userData);
+    // Socket connection for real-time list updates
+    socketRef.current = io(API_BASE_URL);
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    if (user._id) {
+      socketRef.current.emit("register_user", user._id);
+    }
+
+    socketRef.current.on("receive_message", () => {
+      // Reload chats to update order, badges, and previews
+      loadChats();
+    });
+
+    return () => {
+      if (socketRef.current) socketRef.current.disconnect();
+    };
   }, []);
 
   useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user") || "{}");
+    setUser(userData);
     loadChats();
   }, []);
+
+  useEffect(() => {
+    if (chats.length > 0) {
+      // Flatten chats if they are grouped, or just use them if not
+      // The API returns groups by course
+      let allChats = [];
+      chats.forEach(group => {
+        if (group.chats) {
+          group.chats.forEach(chat => {
+            allChats.push({
+              ...chat,
+              courseTitle: group.courseTitle
+            });
+          });
+        }
+      });
+
+      let filtered = allChats;
+
+      if (searchTerm) {
+        filtered = filtered.filter(chat =>
+          chat.student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          chat.courseTitle.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      // Sort by last message
+      filtered.sort((a, b) => {
+        const dateA = a.lastMessage ? new Date(a.lastMessage.createdAt) : new Date(a.createdAt);
+        const dateB = b.lastMessage ? new Date(b.lastMessage.createdAt) : new Date(b.createdAt);
+        return dateB - dateA;
+      });
+
+      setFilteredChats(filtered);
+    } else {
+      setFilteredChats([]);
+    }
+  }, [chats, searchTerm]);
 
   const loadChats = async () => {
     try {
@@ -67,15 +125,23 @@ const MentorMessages = () => {
     loadChats();
   };
 
-  if (selectedChatId) {
-    return (
-      <ChatThread
-        chatId={selectedChatId}
-        onClose={handleChatClose}
-        onMessageSent={handleMessageSent}
-      />
-    );
-  }
+  const formatTime = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays === 1) {
+      return "Yesterday";
+    } else if (diffDays < 7) {
+      return date.toLocaleDateString([], { weekday: 'short' });
+    } else {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+  };
 
   return (
     <div className="mentor-messages-container">
@@ -83,108 +149,105 @@ const MentorMessages = () => {
       <header className="messages-header">
         <div className="header-left">
           <button onClick={() => navigate("/mentor")} className="back-btn">
-            <FaArrowLeft /> Back
+            <FaArrowLeft />
           </button>
-          <div>
-            <h1 className="page-title">
-              <FaComments /> Messages
-            </h1>
-            <p className="page-subtitle">
-              Manage 1-to-1 chats with enrolled students
-            </p>
+          <div className="page-title">
+            <span>Messages</span>
           </div>
         </div>
 
         <div className="profile-section">
           <div className="user-info">
-            <FaUserCircle className="user-avatar" />
-            <div>
-              <span className="user-name">{user?.name || "Mentor"}</span>
-              <span className="user-role">Mentor</span>
+            <div className="user-avatar">
+              {user?.name?.charAt(0) || "M"}
             </div>
+            <span className="user-name">{user?.name || "Mentor"}</span>
           </div>
           <button className="logout-btn" onClick={handleLogout}>
-            <FaSignOutAlt /> Logout
+            <FaSignOutAlt />
           </button>
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
-      <div className="messages-content">
-        {loading ? (
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading messages...</p>
-          </div>
-        ) : error ? (
-          <div className="error-state">
-            <p>{error}</p>
-            <button onClick={loadChats} className="retry-btn">
-              Retry
-            </button>
-          </div>
-        ) : chats.length === 0 ? (
-          <div className="empty-state">
-            <FaComments className="empty-icon" />
-            <h2>No Messages Yet</h2>
-            <p>When students ask you doubts about your courses, they'll appear here.</p>
-          </div>
-        ) : (
-          <div className="chats-container">
-            {chats.map((courseGroup) => (
-              <div key={courseGroup.courseId} className="course-group">
-                <h2 className="course-title">{courseGroup.courseTitle}</h2>
+      {/* CHAT LAYOUT */}
+      <div className={`chat-layout ${selectedChatId ? 'chat-open' : ''}`}>
 
-                <div className="chats-list">
-                  {courseGroup.chats.map((chat) => (
-                    <div
-                      key={chat._id}
-                      className="chat-item"
-                      onClick={() => setSelectedChatId(chat._id)}
-                    >
-                      <div className="chat-header-row">
-                        <div className="student-info">
-                          <div className="student-avatar">
-                            {chat.student.name.charAt(0)}
-                          </div>
-                          <div className="student-details">
-                            <h3>{chat.student.name}</h3>
-                            <span className="student-email">
-                              {chat.student.email}
-                            </span>
-                          </div>
-                        </div>
+        {/* SIDEBAR */}
+        <div className="chat-sidebar">
+          <div className="sidebar-header">
+            <div className="search-container">
+              <FaSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search students..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </div>
+          </div>
 
-                        <div className="chat-meta">
-                          <span className="message-count">
-                            {chat.messageCount} {chat.messageCount === 1 ? "msg" : "msgs"}
-                          </span>
-                          {chat.lastMessage && (
-                            <span className="last-message-time">
-                              {new Date(chat.lastMessage.createdAt).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
+          <div className="sidebar-list">
+            {loading ? (
+              <div className="loading-state">
+                <div className="spinner"></div>
+              </div>
+            ) : filteredChats.length === 0 ? (
+              <div className="empty-state">
+                <p>No conversations found</p>
+              </div>
+            ) : (
+              filteredChats.map((chat) => (
+                <div
+                  key={chat._id}
+                  className={`sidebar-chat-item ${selectedChatId === chat._id ? 'active' : ''}`}
+                  onClick={() => setSelectedChatId(chat._id)}
+                >
+                  <div className="chat-item-avatar">
+                    <div className="avatar-circle">
+                      {chat.student.name.charAt(0)}
+                    </div>
+                  </div>
+                  <div className="chat-item-content">
+                    <div className="chat-item-top">
+                      <div className="chat-item-name">{chat.student.name}</div>
+                      <div className="chat-item-time">
+                        {chat.lastMessage ? formatTime(chat.lastMessage.createdAt) : ""}
                       </div>
-
-                      {chat.lastMessage && (
-                        <div className="last-message">
-                          <span className="last-sender">
-                            {chat.lastMessage.sender?.role === "mentor" ? "You" : chat.student.name}:
-                          </span>
-                          <span className="last-content">
-                            {chat.lastMessage.content.substring(0, 60)}
-                            {chat.lastMessage.content.length > 60 ? "..." : ""}
-                          </span>
-                        </div>
+                    </div>
+                    <div className="chat-item-bottom">
+                      <div className="chat-item-preview">
+                        <span style={{ fontSize: '11px', color: '#6366f1', marginRight: '6px' }}>{chat.courseTitle}</span>
+                        {chat.lastMessage ? chat.lastMessage.content : "Start a conversation"}
+                      </div>
+                      {chat.messageCount > 0 && chat.unreadCount > 0 && (
+                        <div className="chat-item-badge">{chat.unreadCount}</div>
                       )}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
-        )}
+        </div>
+
+        {/* MAIN AREA */}
+        <div className="chat-main">
+          {selectedChatId ? (
+            <ChatThread
+              chatId={selectedChatId}
+              onClose={handleChatClose}
+              onMessageSent={handleMessageSent}
+              isStudent={false}
+            />
+          ) : (
+            <div className="chat-empty-state">
+              <FaComments className="chat-empty-icon" />
+              <div className="chat-empty-text">Select a student to chat</div>
+              <div className="chat-empty-subtext">Choose a conversation from the left to start messaging</div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

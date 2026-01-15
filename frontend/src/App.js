@@ -17,6 +17,7 @@ import CreateCourse from "./pages/CreateCourse";
 import ManageCourse from "./pages/ManageCourse";
 import MentorCoursePreview from "./pages/MentorCoursePreview";
 import MentorMessages from "./pages/MentorMessages";
+import AdminDashboard from "./pages/AdminDashboard";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -128,6 +129,16 @@ function App() {
           element={
             <ProtectedRoute role="mentor">
               <MentorMessages />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 👮 Admin Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

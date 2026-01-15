@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FaGraduationCap, 
-  FaEnvelope, 
-  FaLock, 
+import {
+  FaGraduationCap,
+  FaEnvelope,
+  FaLock,
   FaArrowRight,
   FaUserGraduate,
   FaChalkboardTeacher,
@@ -35,9 +35,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       const res = await loginUser({ email, password });
 
@@ -46,19 +46,20 @@ const Login = () => {
       localStorage.setItem("role", res.data.role);
       localStorage.setItem(
         "user",
-        JSON.stringify({ 
-          token: res.data.token, 
-          role: res.data.role, 
-          name: res.data.name 
+        JSON.stringify({
+          token: res.data.token,
+          role: res.data.role,
+          name: res.data.name
         })
       );
 
       // Redirect based on role
       const redirectPaths = {
         "student": "/student",
-        "mentor": "/mentor"
+        "mentor": "/mentor",
+        "admin": "/admin/dashboard"
       };
-      
+
       navigate(redirectPaths[res.data.role] || "/");
 
     } catch (error) {
@@ -66,7 +67,7 @@ const Login = () => {
       const form = e.target;
       form.classList.add('shake');
       setTimeout(() => form.classList.remove('shake'), 500);
-      
+
       alert(error.response?.data?.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
@@ -79,11 +80,11 @@ const Login = () => {
       <div className="login-bg-gradient"></div>
       <div className="login-floating-shape shape-1"></div>
       <div className="login-floating-shape shape-2"></div>
-      
+
       {/* Main Content */}
       <div className="login-content-wrapper">
         {/* Left Panel - Brand & Info */}
-        <motion.div 
+        <motion.div
           className="login-brand-panel"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -104,7 +105,7 @@ const Login = () => {
 
           <div className="role-cards">
             {roles.map((role, index) => (
-              <motion.div 
+              <motion.div
                 key={index}
                 className="role-card"
                 initial={{ opacity: 0, y: 20 }}
@@ -138,7 +139,7 @@ const Login = () => {
         </motion.div>
 
         {/* Right Panel - Login Form */}
-        <motion.div 
+        <motion.div
           className="login-form-panel"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -152,7 +153,7 @@ const Login = () => {
           <form className="login-form" onSubmit={handleSubmit}>
             <AnimatePresence>
               {isLoading && (
-                <motion.div 
+                <motion.div
                   className="form-loading-overlay"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -166,13 +167,13 @@ const Login = () => {
             <div className="form-group">
               <label htmlFor="email" className="form-label">
                 <FaEnvelope className="label-icon" />
-                Email Address
+                Email / Username
               </label>
               <input
                 id="email"
-                type="email"
+                type="text"
                 className="form-input"
-                placeholder="you@example.com"
+                placeholder="Email or Username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -248,7 +249,7 @@ const Login = () => {
             </div>
           </form>
 
-          
+
         </motion.div>
       </div>
 

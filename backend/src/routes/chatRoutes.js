@@ -1,4 +1,6 @@
 const express = require("express");
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 const {
   getOrCreateChat,
   fetchMessages,
@@ -8,6 +10,8 @@ const {
   getMentorChat,
   getAllStudentChats,
   getStudentChat,
+  markChatRead,
+  uploadAttachment,
 } = require("../controllers/chatController");
 const { protect } = require("../middlewares/authMiddleware");
 
@@ -19,8 +23,15 @@ router.post("/get-or-create", protect, getOrCreateChat);
 // Fetch messages in a chat
 router.get("/:chatId/messages", protect, fetchMessages);
 
+// Mark chat messages as read
+router.put("/:chatId/read", protect, markChatRead);
+
+// Send a message
 // Send a message
 router.post("/send-message", protect, sendMessage);
+
+// Upload attachment
+router.post("/upload", protect, upload.single("file"), uploadAttachment);
 
 // Get all chats for a student in a course
 router.get("/course/:courseId", protect, getStudentChats);

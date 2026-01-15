@@ -17,6 +17,7 @@ app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/mentors", mentorRoutes);
+app.use("/api/admin", require("./src/routes/adminRoutes"));
 
 
 app.get("/", (req, res) => {

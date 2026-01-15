@@ -11,6 +11,34 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      enum: ["text", "image", "file"],
+      default: "text",
+    },
+    fileUrl: {
+      type: String,
+    },
+    fileMetadata: {
+      originalName: String,
+      size: Number,
+      mimeType: String,
+    },
+    status: {
+      type: String,
+      enum: ["sent", "delivered", "read"],
+      default: "sent",
+    },
+    readAt: {
+      type: Date,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    editedAt: {
+      type: Date,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

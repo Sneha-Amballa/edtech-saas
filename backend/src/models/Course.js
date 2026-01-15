@@ -7,7 +7,7 @@ const lessonSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["text", "video"], // ❌ pdf removed
+    enum: ["text", "video"],
     required: true,
   },
   content: {
@@ -25,14 +25,18 @@ const courseSchema = new mongoose.Schema(
     title: String,
     description: String,
     price: Number,
+    category: {
+      type: String,
+      default: "General",
+    },
     mentor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-      enrolledCount: {
-        type: Number,
-        default: 0,
-      },
+    enrolledCount: {
+      type: Number,
+      default: 0,
+    },
     lessons: [lessonSchema],
     published: {
       type: Boolean,

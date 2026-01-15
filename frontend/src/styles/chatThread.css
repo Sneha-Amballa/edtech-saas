@@ -4,6 +4,8 @@
   flex-direction: column;
   height: 100vh;
   background: white;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
 }
 
 /* Thread Header */
@@ -11,10 +13,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 32px;
+  padding: 0 24px;
   background: white;
-  border-bottom: 2px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  height: 80px;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .thread-header .header-left {
@@ -25,25 +30,24 @@
 }
 
 .thread-header .back-btn {
-  display: flex;
+  display: none;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: #f1f5f9;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  color: #475569;
-  font-weight: 600;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: #64748b;
   cursor: pointer;
-  transition: all 0.3s;
-  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .thread-header .back-btn:hover {
-  background: white;
-  border-color: #7c3aed;
-  color: #7c3aed;
-  transform: translateX(-4px);
+  background: #f1f5f9;
+  color: #0f172a;
 }
 
 .student-header-info {
@@ -53,52 +57,129 @@
 }
 
 .student-avatar-large {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
-  color: white;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #4f46e5;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.student-avatar-large.online {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #22c55e;
+}
+
+.status-dot-large {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 12px;
+  height: 12px;
+  background: #22c55e;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.student-header-info>div:last-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
 }
 
 .student-header-info h2 {
-  margin: 0 0 4px 0;
-  font-size: 18px;
+  margin: 0;
+  font-size: 17px;
   color: #1e293b;
   font-weight: 700;
+  line-height: 1.2;
 }
 
-.course-name {
+.user-status-text {
+  display: block;
   font-size: 13px;
   color: #64748b;
+  font-weight: 500;
+}
+
+.typing-text {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 13px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 
 /* Messages Area */
 .thread-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 32px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
   background: #f8fafc;
 }
 
 .empty-thread {
+  margin: auto;
   text-align: center;
-  padding: 60px 20px;
+  padding: 20px;
   color: #94a3b8;
-  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
+.empty-thread-icon {
+  font-size: 48px;
+  animation: wave 2s infinite;
+}
+
+@keyframes wave {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-20deg);
+  }
+
+  75% {
+    transform: rotate(20deg);
+  }
+}
+
+/* Message Items */
 .thread-message {
   display: flex;
-  margin-bottom: 12px;
-  animation: slideIn 0.3s ease-out;
+  max-width: 75%;
+  animation: slideIn 0.2s ease-out;
+  align-items: flex-end;
+  gap: 12px;
 }
 
 @keyframes slideIn {
@@ -106,222 +187,226 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.thread-message.student {
-  justify-content: flex-start;
+.thread-message.is-me {
+  align-self: flex-end;
+  flex-direction: row-reverse;
 }
 
-.thread-message.mentor {
-  justify-content: flex-end;
+.thread-message.is-other {
+  align-self: flex-start;
 }
 
+/* Message Bubbles */
 .message-bubble {
-  max-width: 60%;
-  padding: 12px 16px;
-  border-radius: 12px;
+  padding: 12px 18px;
+  position: relative;
   word-break: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.thread-message.student .message-bubble {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px 12px 12px 4px;
-}
-
-.thread-message.mentor .message-bubble {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+.thread-message.is-me .message-bubble {
+  background: #4f46e5;
   color: white;
-  border-radius: 12px 12px 4px 12px;
+  border-radius: 20px 20px 4px 20px;
+  border: 1px solid #4338ca;
 }
 
-.message-sender {
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 4px;
-  opacity: 0.8;
+.thread-message.is-other .message-bubble {
+  background: white;
+  color: #1e293b;
+  border-radius: 20px 20px 20px 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.message-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .message-text {
   font-size: 15px;
-  line-height: 1.4;
-  margin-bottom: 6px;
+  line-height: 1.5;
 }
 
-.message-time {
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
   font-size: 11px;
-  opacity: 0.6;
 }
 
-/* Error */
-.thread-error {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 40px 20px;
-  text-align: center;
+.thread-message.is-me .message-meta {
+  justify-content: flex-end;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.thread-error p {
-  color: #991b1b;
-  font-size: 16px;
+.thread-message.is-other .message-meta {
+  justify-content: flex-start;
+  color: #94a3b8;
 }
 
-.thread-error button {
-  padding: 10px 20px;
-  background: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
+.read-icon {
+  font-size: 12px;
 }
 
-.thread-error button:hover {
-  background: #b91c1c;
+.thread-message.is-me .read-icon.blue {
+  color: #c7d2fe;
 }
 
-.thread-error-msg {
-  padding: 12px 32px;
-  background: #fee2e2;
-  border-top: 1px solid #fecaca;
-  color: #991b1b;
-  font-size: 13px;
-  text-align: center;
-}
-
-.thread-loading {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.thread-loading .spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #e2e8f0;
-  border-top: 4px solid #7c3aed;
+/* Avatars in list */
+.message-avatar-small {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  background: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
 }
 
-/* Form */
+/* Input Area */
 .thread-form {
   display: flex;
-  gap: 8px;
-  padding: 20px 32px;
+  gap: 12px;
+  padding: 16px 24px;
   background: white;
-  border-top: 2px solid #e2e8f0;
-  flex-shrink: 0;
+  border-top: 1px solid #e2e8f0;
+  align-items: flex-end;
+  margin-bottom: 0;
 }
 
 .thread-input {
   flex: 1;
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
+  padding: 14px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
   font-size: 15px;
-  outline: none;
-  transition: border-color 0.3s;
+  background: #f8fafc;
+  transition: all 0.2s;
+  min-height: 20px;
 }
 
 .thread-input:focus {
-  border-color: #7c3aed;
-}
-
-.thread-input:disabled {
-  background: #f1f5f9;
-  cursor: not-allowed;
+  background: white;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
 }
 
 .thread-send-btn {
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  padding: 0 24px;
+  height: 48px;
+  background: #4f46e5;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 24px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
-  white-space: nowrap;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .thread-send-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  background: #4338ca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 .thread-send-btn:disabled {
-  opacity: 0.5;
+  background: #e2e8f0;
+  color: #94a3b8;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .thread-header {
-    padding: 16px 20px;
-  }
-
-  .student-header-info {
-    gap: 10px;
-  }
-
-  .student-avatar-large {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .student-header-info h2 {
-    font-size: 16px;
-  }
-
-  .thread-messages {
-    padding: 16px 20px;
-  }
-
-  .message-bubble {
-    max-width: 80%;
-  }
-
-  .thread-form {
-    padding: 16px 20px;
-    gap: 6px;
-  }
-
-  .thread-input,
-  .thread-send-btn {
-    font-size: 14px;
-  }
+.thread-attach-btn {
+  width: 48px;
+  height: 48px;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 20px;
 }
 
-@media (max-width: 480px) {
-  .thread-header {
-    gap: 12px;
-  }
+.thread-attach-btn:hover {
+  background: #f8fafc;
+  color: #4f46e5;
+  border-color: #cbd5e1;
+}
 
-  .thread-header .back-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-  }
+/* Attachment Preview */
+.thread-attachment-preview {
+  position: absolute;
+  bottom: 80px;
+  left: 24px;
+  right: 24px;
+  background: white;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 20;
+}
 
-  .message-bubble {
-    max-width: 85%;
-    padding: 10px 12px;
-  }
+/* Image/File styles */
+.thread-image-container {
+  margin-bottom: 4px;
+}
 
-  .thread-form {
-    padding: 12px 16px;
-  }
+.thread-image {
+  max-width: 280px;
+  max-height: 280px;
+  border-radius: 12px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.thread-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.thread-message.is-other .thread-file {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.thread-message.is-me .thread-file {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Scrollbar */
@@ -329,15 +414,36 @@
   width: 6px;
 }
 
+.thread-messages::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
 .thread-messages::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.thread-messages::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
+/* Mobile Tweaks */
+@media (max-width: 768px) {
+  .thread-header {
+    padding: 0 16px;
+    height: 64px;
+    position: relative;
+  }
 
-.thread-messages::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  .thread-header .back-btn {
+    display: flex;
+  }
+
+  .thread-messages {
+    padding: 16px;
+  }
+
+  .thread-message {
+    max-width: 90%;
+  }
+
+  .thread-form {
+    padding: 12px 16px;
+  }
 }

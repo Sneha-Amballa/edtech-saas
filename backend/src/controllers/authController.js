@@ -45,7 +45,11 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    // Allow login with email OR name
+    const user = await User.findOne({
+      $or: [{ email: email }, { name: email }]
+    });
+
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -54,6 +58,10 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
+
+    // Update lastLogin
+    user.lastLogin = Date.now();
+    await user.save();
 
     const token = jwt.sign(
       { _id: user._id, role: user.role },
