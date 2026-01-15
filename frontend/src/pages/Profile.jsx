@@ -440,19 +440,6 @@ const Profile = () => {
                       </div>
                     </div>
 
-                    <div className="stat-card">
-                      <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}>
-                        <FaChartLine />
-                      </div>
-                      <div className="stat-content">
-                        <h3>94%</h3>
-                        <p>Satisfaction Rate</p>
-                      </div>
-                      <div className="achievement-badge">
-                        <FaStar />
-                        <span>Top Rated Mentor</span>
-                      </div>
-                    </div>
 
                     <div className="stat-card">
                       <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ec4899, #f472b6)' }}>
@@ -548,6 +535,21 @@ const Profile = () => {
                       </div>
                       <h3>Teaching Analytics</h3>
                       <p>Manage your courses and track student progress</p>
+                      <div className="teaching-highlights">
+  <h4>Teaching Highlights</h4>
+  <ul>
+    <li>
+      👨‍🎓 You have inspired <strong>{profile.totalEnrollments || 0}</strong> learners.
+    </li>
+    <li>
+      📚 You have created <strong>{profile.totalCourses || 0}</strong> courses.
+    </li>
+    <li>
+      🎯 Students are actively engaging with your content.
+    </li>
+  </ul>
+</div>
+
                     </div>
                   </div>
                 </>
@@ -571,50 +573,69 @@ const Profile = () => {
 
               <div className="analytics-grid">
                 <div className="analytics-card">
-                  <div className="card-header">
-                    <h4>
-                      <IoIosStats />
-                      {profile.role === "student" ? "Learning Activity" : "Enrollment Trends"}
-                    </h4>
-                  </div>
-                  <div className="chart-container">
-                    <Line 
-                      data={profile.role === "student" ? chartData.learningActivity : chartData.enrollments}
-                      options={{
-                        responsive: true,
-                        plugins: {
-                          legend: { display: false }
-                        },
-                        scales: {
-                          y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.05)' }
-                          }
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
+  <div className="card-header">
+    <h4>
+      <IoIosStats />
+      {profile.role === "student" ? "Learning Activity" : "Enrollment Trends"}
+    </h4>
+  </div>
 
-                <div className="analytics-card">
-                  <div className="card-header">
-                    <h4>
-                      <FaChartLine />
-                      {profile.role === "student" ? "Course Progress" : "Completion Rate"}
-                    </h4>
-                  </div>
-                  <div className="chart-container">
-                    <Doughnut 
-                      data={profile.role === "student" ? chartData.courseProgress : chartData.completionRate}
-                      options={{
-                        responsive: true,
-                        plugins: {
-                          legend: { position: 'bottom' }
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
+  {/* ✅ DESCRIPTION GOES HERE */}
+  <p className="chart-description top">
+    {profile.role === "student"
+      ? "Shows how consistently you’ve been engaging with your courses over time."
+      : "Illustrates how student enrollments change over time."}
+  </p>
+
+  <div className="chart-container">
+    <Line 
+      data={profile.role === "student" ? chartData.learningActivity : chartData.enrollments}
+      options={{
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          }
+        }
+      }}
+    />
+  </div>
+</div>
+
+
+
+               <div className="analytics-card">
+  <div className="card-header">
+    <h4>
+      <FaChartLine />
+      {profile.role === "student" ? "Course Progress" : "Completion Rate"}
+    </h4>
+  </div>
+
+  {/* ✅ DESCRIPTION GOES HERE */}
+  <p className="chart-description top">
+    {profile.role === "student"
+      ? "Displays the current status of your enrolled courses."
+      : "Represents how students are progressing through your courses."}
+  </p>
+
+  <div className="chart-container">
+    <Doughnut 
+      data={profile.role === "student" ? chartData.courseProgress : chartData.completionRate}
+      options={{
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }}
+    />
+  </div>
+</div>
+
 
 
                 
@@ -625,7 +646,7 @@ const Profile = () => {
 
         {/* Footer */}
         <footer className="dashboard-footer">
-          <p>© 2024 EduMentor. Your learning journey matters.</p>
+          <p>© 2026 EduMentor. Your learning journey matters.</p>
           <div className="footer-links">
             <Link to="/help">Help Center</Link>
             <Link to="/terms">Terms</Link>

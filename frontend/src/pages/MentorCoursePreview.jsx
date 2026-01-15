@@ -59,6 +59,7 @@ const MentorCoursePreview = () => {
 
   return (
     <div className="course-details-container">
+      <div style={{ position: "fixed", top: "20px", right: "20px", zIndex: 999 }}><ThemeToggle /></div>
       {/* ---------------- HEADER ---------------- */}
       <header className="course-header">
         <div className="header-left">

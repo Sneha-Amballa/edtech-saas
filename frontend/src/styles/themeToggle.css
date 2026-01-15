@@ -1,0 +1,326 @@
+/* Theme Toggle Button Styles */
+.theme-toggle-btn {
+  position: relative;
+  width: 60px;
+  height: 32px;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+  border: 2px solid #cbd5e1;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.98);
+}
+
+.theme-toggle-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  z-index: 2;
+  position: relative;
+}
+
+.sun-icon {
+  color: #f59e0b;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+
+.moon-icon {
+  color: #1e293b;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+
+.theme-toggle-slider {
+  position: absolute;
+  left: 2px;
+  width: 26px;
+  height: 26px;
+  background: white;
+  border-radius: 50%;
+  transition: left 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.theme-toggle-slider.active {
+  left: 32px;
+}
+
+.theme-toggle-btn:hover .theme-toggle-slider {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Positioning for different pages */
+.theme-toggle-top-right {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+}
+
+/* Dark Mode Styles */
+:root {
+  /* Light Mode */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+  --card-bg: #ffffff;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --input-bg: #f1f5f9;
+  --input-border: #cbd5e1;
+  --nav-hover: #f1f5f9;
+}
+
+html.dark-mode {
+  /* Dark Mode */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --border-color: #334155;
+  --card-bg: #1e293b;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --input-bg: #334155;
+  --input-border: #475569;
+  --nav-hover: #334155;
+}
+
+html.dark-mode body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+html.dark-mode .home-container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+html.dark-mode .header {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-bottom-color: var(--border-color);
+}
+
+html.dark-mode .nav-item,
+html.dark-mode .nav-link {
+  color: var(--text-primary);
+}
+
+html.dark-mode .nav-item:hover,
+html.dark-mode .nav-link:hover {
+  color: #3b82f6;
+  background: var(--nav-hover);
+}
+
+html.dark-mode .dropdown-courses {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .dropdown-item {
+  color: var(--text-primary);
+  border-bottom-color: var(--border-color);
+}
+
+html.dark-mode .dropdown-item:hover {
+  background: var(--nav-hover);
+}
+
+html.dark-mode .section {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+html.dark-mode .section-light {
+  background: var(--bg-secondary);
+}
+
+html.dark-mode .course-card,
+html.dark-mode .mentor-card,
+html.dark-mode .feature-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  box-shadow: var(--card-shadow);
+}
+
+html.dark-mode .course-card:hover,
+html.dark-mode .mentor-card:hover,
+html.dark-mode .feature-card:hover {
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
+}
+
+html.dark-mode .card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+html.dark-mode .btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
+}
+
+html.dark-mode .btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+html.dark-mode .btn-secondary:hover {
+  background: var(--nav-hover);
+}
+
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode h5,
+html.dark-mode h6 {
+  color: var(--text-primary);
+}
+
+html.dark-mode p,
+html.dark-mode span,
+html.dark-mode a,
+html.dark-mode label {
+  color: var(--text-primary);
+}
+
+html.dark-mode input,
+html.dark-mode textarea,
+html.dark-mode select {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+}
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+html.dark-mode input:focus,
+html.dark-mode textarea:focus,
+html.dark-mode select:focus {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+html.dark-mode footer {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-top-color: var(--border-color);
+}
+
+html.dark-mode .footer-links a {
+  color: var(--text-secondary);
+}
+
+html.dark-mode .footer-links a:hover {
+  color: #3b82f6;
+}
+
+html.dark-mode .dashboard-footer {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-top-color: var(--border-color);
+}
+
+html.dark-mode .sidebar,
+html.dark-mode .modal,
+html.dark-mode .dialog {
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+html.dark-mode .modal-header,
+html.dark-mode .dialog-header {
+  background: var(--bg-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+html.dark-mode .table {
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+html.dark-mode .table th {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+html.dark-mode .table tbody tr:hover {
+  background: var(--nav-hover);
+}
+
+html.dark-mode .tab {
+  border-bottom-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+html.dark-mode .tab.active {
+  border-bottom-color: #3b82f6;
+  color: var(--text-primary);
+}
+
+html.dark-mode .badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+html.dark-mode .alert {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+html.dark-mode .code,
+html.dark-mode pre {
+  background: var(--bg-secondary);
+  color: #e0e7ff;
+  border-color: var(--border-color);
+}
+
+html.dark-mode .scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+html.dark-mode .scrollbar::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+html.dark-mode .scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+html.dark-mode .scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Smooth Transition for Theme Change */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.theme-toggle-btn,
+.theme-toggle-slider {
+  transition: all 0.3s ease !important;
+}

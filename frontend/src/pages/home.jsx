@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaGraduationCap,
   FaUser,
@@ -25,6 +25,38 @@ import "../styles/home.css";
 
 const Home = () => {
   const [scrollY, setScrollY] = useState(0);
+  const [showCoursesDropdown, setShowCoursesDropdown] = useState(false);
+  const navigate = useNavigate();
+
+  // Check if user is logged in
+  const isLoggedIn = () => {
+    return !!localStorage.getItem("token");
+  };
+
+  // Handle course navigation with auth check
+  const handleCourseAccess = (path = "/courses") => {
+    if (!isLoggedIn()) {
+      navigate("/login");
+    } else {
+      navigate(path);
+    }
+  };
+
+  // Handle enrollment with auth check
+  const handleEnroll = () => {
+    if (!isLoggedIn()) {
+      navigate("/login");
+    }
+  };
+
+  // Handle courses dropdown
+  const toggleCoursesDropdown = () => {
+    if (!isLoggedIn()) {
+      navigate("/login");
+    } else {
+      setShowCoursesDropdown(!showCoursesDropdown);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,10 +95,56 @@ const Home = () => {
 
           <nav className="header-nav">
             <div className="nav-main">
-              <Link to="/courses" className="nav-link">
-                <span>Courses</span>
-                <div className="nav-indicator"></div>
-              </Link>
+              <div className="nav-item-wrapper" style={{ position: "relative" }}>
+                <button 
+                  onClick={toggleCoursesDropdown}
+                  className="nav-link"
+                  style={{ background: "none", border: "none", cursor: "pointer" }}
+                >
+                  <span>Courses</span>
+                  <div className="nav-indicator"></div>
+                </button>
+                
+                {/* Courses Dropdown */}
+                {showCoursesDropdown && (
+                  <div className="courses-dropdown">
+                    <div className="dropdown-content">
+                      {courses.map((course, index) => (
+                        <div key={index} className="dropdown-course-card">
+                          <div className="course-category-badge">{course.category}</div>
+                          <h4 className="dropdown-course-title">{course.title}</h4>
+                          <div className="dropdown-course-meta">
+                            <div className="meta-item">
+                              <FaUsers style={{ fontSize: "0.75rem" }} />
+                              <span>{course.students}</span>
+                            </div>
+                            <div className="meta-item">
+                              <FaClock style={{ fontSize: "0.75rem" }} />
+                              <span>{course.duration}</span>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={handleEnroll}
+                            className="dropdown-course-btn"
+                          >
+                            View Course
+                          </button>
+                        </div>
+                      ))}
+                      <button 
+                        onClick={() => {
+                          setShowCoursesDropdown(false);
+                          handleCourseAccess("/courses");
+                        }}
+                        className="view-all-courses-btn"
+                      >
+                        View All Courses <FaArrowRight style={{ fontSize: "0.875rem" }} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               <Link to="/mentors" className="nav-link">
                 <span>Mentors</span>
                 <div className="nav-indicator"></div>
@@ -137,10 +215,14 @@ const Home = () => {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="hero-actions"
             >
-              <Link to="/courses" className="btn-primary btn-large">
+              <button 
+                onClick={() => handleCourseAccess("/courses")}
+                className="btn-primary btn-large"
+                style={{ background: "var(--gradient-primary)", border: "none", cursor: "pointer" }}
+              >
                 <span>Explore Courses</span>
                 <FaArrowRight className="arrow-icon" />
-              </Link>
+              </button>
               <button className="btn-video">
                 <div className="video-play">
                   <FaPlay />
@@ -262,9 +344,13 @@ const Home = () => {
         <div className="section-header">
           <h2 className="section-title">Most Popular Courses</h2>
           <p className="section-subtitle">Hands-on learning with industry experts</p>
-          <Link to="/courses" className="section-link">
+          <button 
+            onClick={() => handleCourseAccess("/courses")}
+            className="section-link"
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--primary)", display: "flex", alignItems: "center", gap: "0.5rem" }}
+          >
             View all courses <FaArrowRight />
-          </Link>
+          </button>
         </div>
 
         <div className="courses-grid">
@@ -284,7 +370,15 @@ const Home = () => {
               </div>
               <div className="course-footer">
                 <span className="course-price">From $499</span>
-                <button className="btn-outline">View Details</button>
+                <button 
+                  onClick={handleEnroll}
+                  className="btn-outline"
+                  style={{ padding: "0.625rem 1.25rem", borderRadius: "6px", border: "1.5px solid var(--gray-300)", background: "transparent", color: "var(--gray-700)", fontWeight: "500", cursor: "pointer", transition: "all 0.2s ease" }}
+                  onMouseEnter={(e) => { e.target.style.borderColor = "var(--primary)"; e.target.style.color = "var(--primary)"; e.target.style.background = "rgba(37, 99, 235, 0.05)"; }}
+                  onMouseLeave={(e) => { e.target.style.borderColor = "var(--gray-300)"; e.target.style.color = "var(--gray-700)"; e.target.style.background = "transparent"; }}
+                >
+                  View Details
+                </button>
               </div>
             </div>
           ))}
@@ -359,9 +453,13 @@ const Home = () => {
             <h2>Ready to Transform Your Career?</h2>
             <p>Join thousands of professionals who have accelerated their growth with EduMentor</p>
             <div className="cta-actions">
-              <Link to="/register" className="btn-primary btn-large">
+              <button 
+                onClick={handleEnroll}
+                className="btn-primary btn-large"
+                style={{ background: "var(--gradient-primary)", border: "none", cursor: "pointer" }}
+              >
                 Start Free Trial
-              </Link>
+              </button>
               <Link to="/demo" className="btn-secondary">
                 Schedule a Demo
               </Link>
@@ -414,7 +512,7 @@ const Home = () => {
           </div>
 
           <div className="footer-bottom">
-            <p>© 2024 EduMentor. All rights reserved.</p>
+            <p>© 2026 EduMentor. All rights reserved.</p>
             <div className="footer-social">
               <span>Connect with us:</span>
               <div className="social-links">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPublicCourseById } from "../services/courseService";
+import ThemeToggle from "../components/ThemeToggle";
 import {
   FaLock,
   FaUnlock,

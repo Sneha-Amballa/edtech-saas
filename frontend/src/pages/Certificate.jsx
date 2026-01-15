@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getCertificate } from "../services/enrollmentService";
+import ThemeToggle from "../components/ThemeToggle";
 import "../styles/courseDetails.css";
 import "../styles/certificate.css";
 

@@ -407,13 +407,13 @@
 .role-info h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--gray-900);
+  color: white;
   margin-bottom: 0.25rem;
 }
 
 .role-info p {
   font-size: 0.75rem;
-  color: var(--gray-600);
+  color: rgb(211, 211, 211);
 }
 
 .role-check {
@@ -594,7 +594,7 @@
 }
 
 .benefits-subtitle {
-  color: var(--gray-400);
+  color: var(--gray-300);
   font-size: 1rem;
   max-width: 400px;
   margin: 0 auto;
@@ -644,7 +644,7 @@
 
 .benefit-card p {
   font-size: 0.875rem;
-  color: var(--gray-400);
+  color: var(--gray-300);
   line-height: 1.5;
 }
 
@@ -665,7 +665,7 @@
 
 .testimonial-text {
   font-style: italic;
-  color: var(--gray-300);
+  color: var(--gray-200);
   margin-bottom: 1rem;
   padding-left: 1rem;
   border-left: 3px solid var(--primary);
@@ -705,17 +705,21 @@
   justify-content: space-around;
   text-align: center;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
 }
 
 .stat h4 {
   font-size: 2rem;
   font-weight: 700;
-  color: white;
   margin-bottom: 0.25rem;
 }
-
+.stat-item {
+    background: rgb(168, 98, 98);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
 .stat p {
   font-size: 0.875rem;
   color: var(--gray-400);
@@ -894,4 +898,47 @@
   .logo-icon {
     font-size: 2rem;
   }
+}
+
+
+/* ==================================
+   FORCE SHOW STATS ON ALL SCREENS
+   ================================== */
+
+@media (max-width: 1024px) {
+  .register-benefits-panel {
+    display: block !important;
+  }
+}
+
+/* Ensure stats are visible */
+.register-benefits-panel .stats-section {
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 1.5rem !important;
+  padding: 2rem !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-radius: 16px !important;
+}
+
+/* Stat cards */
+.register-benefits-panel .stat {
+  flex: 1 !important;
+  text-align: center !important;
+  padding: 1.5rem !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+}
+
+/* Numbers */
+.register-benefits-panel .stat h4 {
+  color: #ffffff !important;
+  font-size: 2.4rem !important;
+  font-weight: 700 !important;
+}
+
+/* Labels */
+.register-benefits-panel .stat p {
+  color: #cbd5e1 !important;
+  font-size: 0.9rem !important;
 }

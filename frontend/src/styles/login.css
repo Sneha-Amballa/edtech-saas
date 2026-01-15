@@ -198,7 +198,7 @@
 
 .role-info p {
   font-size: 0.875rem;
-  color: var(--gray-400);
+  color: var(--gray-300);
 }
 
 /* Brand Stats */
@@ -218,7 +218,7 @@
 
 .stat-item p {
   font-size: 0.875rem;
-  color: var(--gray-400);
+  color: var(--gray-300);
 }
 
 /* Right Panel - Login Form */

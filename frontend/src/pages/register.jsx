@@ -424,7 +424,7 @@ const Register = () => {
 
       {/* Footer */}
       <footer className="register-footer">
-        <p>© 2024 EduMentor. All rights reserved.</p>
+        <p>© 2026 EduMentor. All rights reserved.</p>
         <div className="footer-links">
           <Link to="/help">Help Center</Link>
           <span>•</span>

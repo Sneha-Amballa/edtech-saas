@@ -394,7 +394,7 @@ const MyCourses = () => {
 
         {/* Footer */}
         <footer className="dashboard-footer">
-          <p>© 2024 EduMentor. Empowering learners worldwide.</p>
+          <p>© 2026 EduMentor. Empowering learners worldwide.</p>
           <div className="footer-links">
             <Link to="/help">Help Center</Link>
             <Link to="/terms">Terms</Link>
