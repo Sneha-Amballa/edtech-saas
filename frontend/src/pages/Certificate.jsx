@@ -8,6 +8,18 @@ import "../styles/certificate.css";
 const Certificate = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  /*
+  // TEMP: Mock data for visual verification
+  const [certificate, setCertificate] = useState({
+    studentName: "Alex Johnson",
+    courseTitle: "Advanced Web Development",
+    mentorName: "Dr. Sarah Chen",
+    completionDate: new Date().toISOString(),
+    certificateId: "CERT-2026-XYZ-123"
+  });
+  const [loading, setLoading] = useState(false); // Disable loading
+  */
+
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
@@ -35,13 +47,36 @@ const Certificate = () => {
   const handleDownloadPNG = async () => {
     try {
       const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(containerRef.current);
+      const element = containerRef.current;
+
+      // Temporary styling for better capture
+      const originalBoxShadow = element.style.boxShadow;
+      element.style.boxShadow = "none"; // Remove shadow for cleaner edge
+
+      const canvas = await html2canvas(element, {
+        scale: 3, // Higher quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        x: 0,
+        y: 0,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      });
+
+      // Restore styling
+      element.style.boxShadow = originalBoxShadow;
+
       const url = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${certificate.courseTitle}-${certificate.certificateId}.png`;
+      a.download = `Certificate-${certificate.studentName.replace(/\s+/g, '_')}-${certificate.courseTitle.replace(/\s+/g, '_')}.png`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
     } catch (err) {
+      console.error("Download failed:", err);
       // fallback to print dialog
       handlePrint();
     }
@@ -64,20 +99,20 @@ const Certificate = () => {
           <p className="page-subtitle">Your achievement is ready to share</p>
         </div>
         <div className="certificate-actions">
-          <button 
-            className="action-btn back-btn" 
+          <button
+            className="action-btn back-btn"
             onClick={() => navigate(-1)}
           >
             ← Back
           </button>
-          <button 
-            className="action-btn primary-btn" 
+          <button
+            className="action-btn primary-btn"
             onClick={handlePrint}
           >
             🖨️ Print / Save PDF
           </button>
-          <button 
-            className="action-btn secondary-btn" 
+          <button
+            className="action-btn secondary-btn"
             onClick={handleDownloadPNG}
           >
             📥 Download PNG
@@ -92,7 +127,7 @@ const Certificate = () => {
           <div className="border-corner top-right"></div>
           <div className="border-corner bottom-left"></div>
           <div className="border-corner bottom-right"></div>
-          
+
           {/* Header */}
           <div className="certificate-header-decoration">
             <div className="certificate-seal">
@@ -112,7 +147,7 @@ const Certificate = () => {
               has successfully completed the course with distinction
             </p>
             <h2 className="cert-course">{certificate.courseTitle}</h2>
-            
+
             <div className="certificate-details">
               <div className="detail-item">
                 <span className="detail-label">Mentor:</span>

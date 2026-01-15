@@ -24,8 +24,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Header */
@@ -125,16 +130,18 @@
 /* Certificate Card */
 .certificate-card {
   background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
-  border-radius: 20px;
-  padding: 60px;
+  border-radius: 16px;
+  padding: 30px 50px;
+  /* Less vertical padding, more horizontal */
   position: relative;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.08),
     0 8px 16px rgba(0, 0, 0, 0.04),
     inset 0 0 0 1px rgba(255, 255, 255, 0.8);
   border: 2px solid #e2e8f0;
-  min-height: 700px;
+  min-height: 400px;
+  /* Reduced min-height */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -143,36 +150,36 @@
 /* Border Corners */
 .border-corner {
   position: absolute;
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
   border: 2px solid #3a86ff;
   opacity: 0.2;
 }
 
 .top-left {
-  top: 20px;
-  left: 20px;
+  top: 15px;
+  left: 15px;
   border-right: none;
   border-bottom: none;
 }
 
 .top-right {
-  top: 20px;
-  right: 20px;
+  top: 15px;
+  right: 15px;
   border-left: none;
   border-bottom: none;
 }
 
 .bottom-left {
-  bottom: 20px;
-  left: 20px;
+  bottom: 15px;
+  left: 15px;
   border-right: none;
   border-top: none;
 }
 
 .bottom-right {
-  bottom: 20px;
-  right: 20px;
+  bottom: 15px;
+  right: 15px;
   border-left: none;
   border-top: none;
 }
@@ -180,16 +187,18 @@
 /* Certificate Header Decoration */
 .certificate-header-decoration {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 10px;
+  /* Reduced margin */
   position: relative;
 }
 
 .certificate-seal {
-  width: 100px;
-  height: 100px;
+  width: 60px;
+  /* Smaller seal */
+  height: 60px;
   background: linear-gradient(135deg, #3a86ff 0%, #2a75eb 100%);
   border-radius: 50%;
-  margin: 0 auto 30px;
+  margin: 0 auto 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -197,19 +206,19 @@
 }
 
 .seal-inner {
-  width: 80px;
-  height: 80px;
+  width: 48px;
+  height: 48px;
   background: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
+  font-size: 24px;
   color: #3a86ff;
 }
 
 .cert-title {
-  font-size: 32px;
+  font-size: 24px;
   color: #2d3748;
   margin: 0;
   font-weight: 700;
@@ -218,9 +227,9 @@
 
 .decoration-line {
   height: 3px;
-  width: 200px;
+  width: 150px;
   background: linear-gradient(90deg, transparent, #3a86ff, transparent);
-  margin: 20px auto;
+  margin: 10px auto;
 }
 
 /* Certificate Content */
@@ -230,18 +239,20 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 30px;
+  gap: 15px;
+  /* Reduced gap */
 }
 
 .cert-sub {
-  font-size: 20px;
+  font-size: 16px;
   color: #718096;
   margin: 0;
   font-style: italic;
 }
 
 .cert-name {
-  font-size: 48px;
+  font-size: 42px;
+  /* Large name */
   color: #2d3748;
   margin: 0;
   font-weight: 800;
@@ -251,21 +262,22 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1.2;
 }
 
 .cert-text {
-  font-size: 22px;
+  font-size: 18px;
   color: #718096;
   margin: 0;
   font-weight: 400;
 }
 
 .cert-course {
-  font-size: 32px;
+  font-size: 28px;
   color: #3a86ff;
   margin: 0;
   font-weight: 700;
-  padding: 20px 40px;
+  padding: 10px 30px;
   background: linear-gradient(90deg, #f0f7ff, white, #f0f7ff);
   border-radius: 12px;
   display: inline-block;
@@ -379,18 +391,19 @@
 
 /* Print Styles */
 @media print {
+
   .certificate-header,
   .certificate-info,
   .border-corner,
   .certificate-watermark {
     display: none;
   }
-  
+
   .certificate-page {
     background: white;
     padding: 0;
   }
-  
+
   .certificate-card {
     box-shadow: none;
     border: 3px solid #2d3748;
@@ -404,32 +417,32 @@
     flex-direction: column;
     text-align: center;
   }
-  
+
   .certificate-actions {
     justify-content: center;
   }
-  
+
   .certificate-card {
     padding: 30px;
     min-height: 600px;
   }
-  
+
   .cert-name {
     font-size: 32px;
   }
-  
+
   .cert-course {
     font-size: 24px;
     padding: 15px;
   }
-  
+
   .cert-footer {
     flex-direction: column;
     gap: 30px;
     align-items: center;
     text-align: center;
   }
-  
+
   .certificate-details {
     flex-direction: column;
     gap: 20px;
