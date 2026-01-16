@@ -12,6 +12,7 @@ import {
   FaBookOpen
 } from "react-icons/fa";
 import { FiTrendingUp } from "react-icons/fi";
+import ThemeToggle from "../components/ThemeToggle";
 import "../styles/courseDetails.css"; // reuse same styles
 
 const MentorCoursePreview = () => {
@@ -105,9 +106,8 @@ const MentorCoursePreview = () => {
             {course.lessons.map((lesson, index) => (
               <div
                 key={lesson._id}
-                className={`lesson-item ${
-                  activeLesson?._id === lesson._id ? "active" : ""
-                }`}
+                className={`lesson-item ${activeLesson?._id === lesson._id ? "active" : ""
+                  }`}
               >
                 <div
                   className="lesson-header"
@@ -160,10 +160,10 @@ const MentorCoursePreview = () => {
         </div>
 
         <div className="mentor-analytics">
-  <p><FaUsers /> {course.enrolledCount || 0} Enrollments</p>
-  <p><FaStar /> Rating: {course.rating || "N/A"}</p>
-  <p><FiTrendingUp /> Status: {course.published ? "Published" : "Draft"}</p>
-</div>
+          <p><FaUsers /> {course.enrolledCount || 0} Enrollments</p>
+          <p><FaStar /> Rating: {course.rating || "N/A"}</p>
+          <p><FiTrendingUp /> Status: {course.published ? "Published" : "Draft"}</p>
+        </div>
 
       </div>
     </div>
