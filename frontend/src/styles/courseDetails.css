@@ -570,12 +570,32 @@
 .lesson-type {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
   font-size: 0.75rem;
-  color: var(--gray-600);
-  background: var(--gray-100);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+}
+
+.lesson-type.video {
+  color: #2563eb;
+  /* var(--primary) fallback */
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.lesson-type.text {
+  color: #8b5cf6;
+  /* var(--accent) fallback */
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.lesson-type:hover {
+  transform: translateY(-1px);
 }
 
 .lesson-meta {
@@ -994,7 +1014,9 @@
 
 /* Animations */
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */
@@ -1002,7 +1024,7 @@
   .content-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .course-hero {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -1035,24 +1057,24 @@
   .course-main {
     padding: 1rem;
   }
-  
+
   .course-hero {
     padding: 2rem 1.5rem;
   }
-  
+
   .course-title {
     font-size: 2rem;
   }
-  
+
   .hero-meta {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .learnings-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .progress-stats {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1064,16 +1086,16 @@
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .header-right {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .price-amount {
     font-size: 2.5rem;
   }
-  
+
   .progress-stats {
     grid-template-columns: 1fr;
   }
@@ -1096,7 +1118,8 @@
 .hero-content {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;   /* 👈 LEFT ALIGN */
+  align-items: flex-start;
+  /* 👈 LEFT ALIGN */
   justify-content: center;
   text-align: left;
 }
@@ -1189,17 +1212,20 @@
 .course-image {
   display: none !important;
 }
+
 .course-thumbnail {
   background: transparent !important;
   box-shadow: none !important;
 }
+
 .course-thumbnail {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   color: white;
   border-radius: 12px;
   font-size: 1.5rem;
   font-weight: 700;
 }
+
 /* 🔥 HARD RESET ANY COURSE CARD / THUMBNAIL STYLES IN HERO */
 .course-hero .course-title,
 .course-hero .course-description,
@@ -1215,6 +1241,7 @@
   box-shadow: none !important;
   border-radius: 0 !important;
 }
+
 /* HERO COURSE TITLE – SIZE & COLOR */
 .course-hero .course-title {
   font-size: 3.5rem;
@@ -1226,27 +1253,34 @@
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.85);
 }
+
 /* 🔥 FORCE NORMAL COLOR TEXT FOR COURSE TITLE */
 .course-hero .course-title {
   background: none !important;
   -webkit-background-clip: initial !important;
-  -webkit-text-fill-color: white !important; /* 👈 THIS FIXES IT */
+  -webkit-text-fill-color: white !important;
+  /* 👈 THIS FIXES IT */
   color: white !important;
 }
+
 /* FIX: Move Back to Dashboard to LEFT */
 .course-header .header-content {
-  justify-content: space-between; /* left + right */
+  justify-content: space-between;
+  /* left + right */
 }
 
 .course-header .header-left {
-  flex-direction: row;           /* back button + breadcrumb in one row */
+  flex-direction: row;
+  /* back button + breadcrumb in one row */
   align-items: center;
   gap: 1rem;
 }
 
 .course-header .back-btn {
-  margin: 0;                     /* remove any auto centering */
+  margin: 0;
+  /* remove any auto centering */
 }
+
 /* courseDetails.css - Mentor Course Preview */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
@@ -1260,7 +1294,7 @@
   --mentor-warning: #f59e0b;
   --mentor-danger: #ef4444;
   --mentor-info: #3b82f6;
-  
+
   /* Neutral Colors */
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
@@ -1272,19 +1306,19 @@
   --gray-700: #334155;
   --gray-800: #1e293b;
   --gray-900: #0f172a;
-  
+
   /* Gradients */
   --gradient-mentor: linear-gradient(135deg, var(--mentor-primary) 0%, var(--mentor-secondary) 100%);
   --gradient-success: linear-gradient(135deg, var(--mentor-success) 0%, #10b981 100%);
   --gradient-warning: linear-gradient(135deg, var(--mentor-warning) 0%, #f59e0b 100%);
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
   --shadow-mentor: 0 10px 40px rgba(124, 58, 237, 0.15);
-  
+
   /* Transitions */
   --transition-base: all 0.2s ease;
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1318,10 +1352,10 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(124, 58, 237, 0.02) 0%, 
-    rgba(14, 165, 233, 0.02) 50%, 
-    rgba(139, 92, 246, 0.02) 100%);
+  background: linear-gradient(135deg,
+      rgba(124, 58, 237, 0.02) 0%,
+      rgba(14, 165, 233, 0.02) 50%,
+      rgba(139, 92, 246, 0.02) 100%);
   z-index: -1;
 }
 
@@ -1594,6 +1628,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1774,7 +1809,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Not Found State */
@@ -1791,7 +1828,7 @@ h2 {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .course-card {
     position: static;
   }
@@ -1802,42 +1839,42 @@ h2 {
     flex-direction: column;
     padding: 1.5rem;
   }
-  
+
   .edit-course-btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .course-title {
     font-size: 2rem;
   }
-  
+
   .course-overview {
     margin: 0 1rem 1.5rem;
     padding: 1.5rem;
   }
-  
+
   .course-content-wrapper {
     padding: 0 1rem 1.5rem;
   }
-  
+
   .content-header {
     padding: 1.25rem 1.5rem;
   }
-  
+
   .lesson-header {
     padding: 1rem 1.5rem;
   }
-  
+
   .lesson-content {
     padding: 0 1.5rem 1.5rem;
   }
-  
+
   .course-stats {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .course-stats span {
     width: 100%;
     justify-content: center;
@@ -1848,15 +1885,15 @@ h2 {
   .course-title {
     font-size: 1.75rem;
   }
-  
+
   .course-card h2 {
     font-size: 2rem;
   }
-  
+
   .content-header h2 {
     font-size: 1.25rem;
   }
-  
+
   .lesson-info h4 {
     font-size: 0.875rem;
   }
@@ -1868,6 +1905,7 @@ h2 {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1877,6 +1915,7 @@ h2 {
 .lesson-item {
   animation: fadeIn 0.3s ease-out;
 }
+
 /* =====================================================
    ✅ FIX: LEARNING PROGRESS VISIBILITY (FINAL)
    ===================================================== */
@@ -1896,7 +1935,8 @@ h2 {
 
 /* Percentage (100%) */
 .progress-percent {
-  color: #2563eb !important; /* solid blue */
+  color: #2563eb !important;
+  /* solid blue */
   font-weight: 800;
 }
 

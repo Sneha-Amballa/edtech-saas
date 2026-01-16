@@ -424,7 +424,7 @@ const CourseDetails = () => {
                         <div className="lesson-info">
                           <div className="lesson-title-row">
                             <h4>{lesson.title}</h4>
-                            <span className="lesson-type">
+                            <span className={`lesson-type ${lesson.type}`}>
                               {lesson.type === "video" ? <FaVideo /> : <FaFileAlt />}
                               {lesson.type}
                             </span>

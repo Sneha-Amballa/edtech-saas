@@ -29,20 +29,30 @@ const seedDatabase = async () => {
         const studentPass = await bcrypt.hash("Student@123", salt);
         const mentorPass = await bcrypt.hash("Mentor@123", salt);
 
+        // Past dates for join history
+        const d1 = new Date(); d1.setDate(d1.getDate() - 3);  // 3 days ago
+        const d2 = new Date(); d2.setDate(d2.getDate() - 15); // 15 days ago
+        const d3 = new Date(); d3.setDate(d3.getDate() - 45); // 45 days ago
+        const d4 = new Date(); d4.setDate(d4.getDate() - 120); // 120 days ago
+
         const studentsData = [
-            { name: "Karan Malhotra", email: "karan@student.com", password: studentPass, role: "student" },
-            { name: "Pooja Iyer", email: "pooja@student.com", password: studentPass, role: "student" },
-            { name: "Aditya Kulkarni", email: "aditya@student.com", password: studentPass, role: "student" },
-            { name: "Nisha Fernandes", email: "nisha@student.com", password: studentPass, role: "student" },
+            { name: "Karan Malhotra", email: "karan@student.com", password: studentPass, role: "student", createdAt: d4 },
+            { name: "Pooja Iyer", email: "pooja@student.com", password: studentPass, role: "student", createdAt: d3 },
+            { name: "Aditya Kulkarni", email: "aditya@student.com", password: studentPass, role: "student", createdAt: d3 },
+            { name: "Nisha Fernandes", email: "nisha@student.com", password: studentPass, role: "student", createdAt: d2 },
+            { name: "Rohan Mehta", email: "rohan@student.com", password: studentPass, role: "student", createdAt: d2 },
+            { name: "Sanya Mir", email: "sanya@student.com", password: studentPass, role: "student", createdAt: d1 },
+            { name: "Liam O'Connor", email: "liam@student.com", password: studentPass, role: "student", createdAt: d1 },
         ];
 
         const mentorsData = [
-            { name: "Vikram Desai", email: "vikram@mentor.com", password: mentorPass, role: "mentor" },
-            { name: "Shalini Gupta", email: "shalini@mentor.com", password: mentorPass, role: "mentor" },
-            { name: "Mohit Khanna", email: "mohit@mentor.com", password: mentorPass, role: "mentor" },
-            { name: "Ritika Banerjee", email: "ritika@mentor.com", password: mentorPass, role: "mentor" },
+            { name: "Vikram Desai", email: "vikram@mentor.com", password: mentorPass, role: "mentor", createdAt: d4 },
+            { name: "Shalini Gupta", email: "shalini@mentor.com", password: mentorPass, role: "mentor", createdAt: d4 },
+            { name: "Mohit Khanna", email: "mohit@mentor.com", password: mentorPass, role: "mentor", createdAt: d3 },
+            { name: "Ritika Banerjee", email: "ritika@mentor.com", password: mentorPass, role: "mentor", createdAt: d2 },
+            { name: "Dr. Anjali Verma", email: "anjali@mentor.com", password: mentorPass, role: "mentor", createdAt: d2 },
+            { name: "Chris Wilson", email: "chris@mentor.com", password: mentorPass, role: "mentor", createdAt: d1 },
         ];
-
         const students = await User.insertMany(studentsData);
         const mentors = await User.insertMany(mentorsData);
 
@@ -119,6 +129,10 @@ const seedDatabase = async () => {
             { student: "Aditya Kulkarni", course: "Node.js & Express", percent: 20 },
             { student: "Nisha Fernandes", course: "Git & GitHub", percent: 80 },
             { student: "Nisha Fernandes", course: "Placement Preparation", percent: 35 },
+            { student: "Rohan Mehta", course: "JavaScript for Beginners", percent: 10 },
+            { student: "Rohan Mehta", course: "React Basics", percent: 5 },
+            { student: "Sanya Mir", course: "HTML – From Basics", percent: 90 },
+            { student: "Liam O'Connor", course: "Node.js & Express", percent: 60 },
         ];
 
         for (const e of enrollmentsData) {

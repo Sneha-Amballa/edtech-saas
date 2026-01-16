@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getCourseById, addLesson, updateCourse, deleteLesson } from "../services/courseService";
-import { 
-  FaArrowLeft, 
-  FaBook, 
-  FaPlus, 
-  FaTimes, 
-  FaFileAlt, 
-  FaVideo, 
-  FaUnlockAlt, 
+import {
+  FaArrowLeft,
+  FaBook,
+  FaPlus,
+  FaTimes,
+  FaFileAlt,
+  FaVideo,
+  FaUnlockAlt,
   FaLock,
   FaUpload,
   FaChevronDown,
@@ -77,11 +77,11 @@ const ManageCourse = () => {
 
       await addLesson(id, formData);
       setShowForm(false);
-      setLesson({ 
-        title: "", 
-        type: "text", 
-        textContent: "", 
-        isFree: false 
+      setLesson({
+        title: "",
+        type: "text",
+        textContent: "",
+        isFree: false
       });
       setFile(null);
       setFileName("");
@@ -101,11 +101,11 @@ const ManageCourse = () => {
 
   const handleCancel = () => {
     setShowForm(false);
-    setLesson({ 
-      title: "", 
-      type: "text", 
-      textContent: "", 
-      isFree: false 
+    setLesson({
+      title: "",
+      type: "text",
+      textContent: "",
+      isFree: false
     });
     setFile(null);
     setFileName("");
@@ -125,7 +125,7 @@ const ManageCourse = () => {
       <div className="manage-error-container">
         <div className="manage-error-message">
           <p>{error}</p>
-          <button 
+          <button
             onClick={() => loadCourse()}
             className="manage-btn-primary"
           >
@@ -141,7 +141,7 @@ const ManageCourse = () => {
       <div className="manage-error-container">
         <div className="manage-error-message">
           <p>Course not found.</p>
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="manage-btn-secondary"
           >
@@ -157,7 +157,7 @@ const ManageCourse = () => {
       {/* Header */}
       <header className="manage-header">
         <div className="manage-header-top">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="manage-back-btn"
           >
@@ -165,7 +165,7 @@ const ManageCourse = () => {
           </button>
           <h1 className="manage-title">Manage Course</h1>
         </div>
-        
+
         <div className="course-info-card">
           <div className="course-info-header">
             <FaBook className="course-info-icon" />
@@ -186,24 +186,24 @@ const ManageCourse = () => {
               </button>
             </div>
           </div>
-        {editingDetails && (
-          <form className="edit-course-form" onSubmit={async (e) => {
-            e.preventDefault();
-            try {
-              await updateCourse(id, courseForm);
-              alert('Course updated');
-              setEditingDetails(false);
-              loadCourse();
-            } catch (err) {
-              alert('Failed to update course');
-            }
-          }}>
-            <input value={courseForm.title} onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })} placeholder="Title" required />
-            <textarea value={courseForm.description} onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })} placeholder="Description" rows={3} />
-            <input value={courseForm.price} onChange={(e) => setCourseForm({ ...courseForm, price: e.target.value })} placeholder="Price" type="number" min="0" />
-            <button type="submit" className="manage-btn-primary">Save</button>
-          </form>
-        )}
+          {editingDetails && (
+            <form className="edit-course-form" onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                await updateCourse(id, courseForm);
+                alert('Course updated');
+                setEditingDetails(false);
+                loadCourse();
+              } catch (err) {
+                alert('Failed to update course');
+              }
+            }}>
+              <input value={courseForm.title} onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })} placeholder="Title" required />
+              <textarea value={courseForm.description} onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })} placeholder="Description" rows={3} />
+              <input value={courseForm.price} onChange={(e) => setCourseForm({ ...courseForm, price: e.target.value })} placeholder="Price" type="number" min="0" />
+              <button type="submit" className="manage-btn-primary">Save</button>
+            </form>
+          )}
         </div>
       </header>
 
@@ -225,7 +225,7 @@ const ManageCourse = () => {
               <>
                 <div className="lessons-list">
                   {course.lessons.map((l, index) => (
-                    <div 
+                    <div
                       key={l._id || index}
                       className={`lesson-card ${selectedLesson?._id === l._id ? 'selected' : ''}`}
                       onClick={() => setSelectedLesson(l)}
@@ -233,7 +233,7 @@ const ManageCourse = () => {
                       <div className="lesson-card-icon">
                         {l.type === "text" ? <FaFileAlt /> : <FaVideo />}
                       </div>
-                      
+
                       <div className="lesson-card-content">
                         <div className="lesson-card-header">
                           <h4 className="lesson-card-title">{l.title}</h4>
@@ -245,20 +245,20 @@ const ManageCourse = () => {
                         </div>
                         <div className="lesson-card-meta">
                           <span className="lesson-number">Lesson {index + 1}</span>
-                          <span className="lesson-type-tag">
+                          <span className={`lesson-type-tag ${l.type}`}>
                             {l.type === "text" ? "Text" : "Video"}
                           </span>
                         </div>
                       </div>
-                      
+
                       <button className="lesson-preview-btn">
                         <FaEye />
                       </button>
                     </div>
                   ))}
                 </div>
-                
-                <button 
+
+                <button
                   onClick={() => setShowForm(true)}
                   className="add-lesson-btn"
                 >
@@ -274,7 +274,7 @@ const ManageCourse = () => {
                 <p className="empty-description">
                   Start by adding your first lesson to this course
                 </p>
-                <button 
+                <button
                   onClick={() => setShowForm(true)}
                   className="add-lesson-btn"
                 >
@@ -291,14 +291,14 @@ const ManageCourse = () => {
                 <div className="form-panel">
                   <div className="form-panel-header">
                     <h3>Add New Lesson</h3>
-                    <button 
+                    <button
                       onClick={handleCancel}
                       className="close-form-btn"
                     >
                       <FaTimes />
                     </button>
                   </div>
-                  
+
                   <form onSubmit={handleSubmit} className="lesson-form">
                     <div className="form-group">
                       <label htmlFor="lessonTitle">Lesson Title *</label>
@@ -314,7 +314,7 @@ const ManageCourse = () => {
                         required
                       />
                     </div>
-                    
+
                     <div className="form-group">
                       <label htmlFor="lessonType">Lesson Type</label>
                       <div className="select-wrapper">
@@ -332,7 +332,7 @@ const ManageCourse = () => {
                         <FaChevronDown className="select-arrow" />
                       </div>
                     </div>
-                    
+
                     {lesson.type === "text" ? (
                       <div className="form-group">
                         <label htmlFor="textContent">Lesson Content</label>
@@ -376,7 +376,7 @@ const ManageCourse = () => {
                         )}
                       </div>
                     )}
-                    
+
                     <div className="form-group">
                       <div className="access-toggle">
                         <label className="toggle-label">
@@ -402,20 +402,20 @@ const ManageCourse = () => {
                           </span>
                         </label>
                         <p className="toggle-description">
-                          {lesson.isFree 
+                          {lesson.isFree
                             ? "This lesson will be available for free preview"
                             : "This lesson requires course enrollment"
                           }
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="form-actions">
                       <button type="submit" className="manage-btn-primary">
                         <FaCheck /> Save Lesson
                       </button>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={handleCancel}
                         className="manage-btn-secondary"
                       >
@@ -441,18 +441,18 @@ const ManageCourse = () => {
                       </span>
                     )}
                   </div>
-                  
+
                   <div className="preview-content">
                     <h2 className="preview-lesson-title">{selectedLesson.title}</h2>
                     <div className="preview-meta">
-                      <span className="preview-type">
+                      <span className={`preview-type ${selectedLesson.type}`}>
                         {selectedLesson.type === "text" ? "Text Lesson" : "Video Lesson"}
                       </span>
                       <span className="preview-date">
                         • Added recently
                       </span>
                     </div>
-                    
+
                     <div className="preview-body">
                       {selectedLesson.type === "text" ? (
                         <div className="text-preview">
@@ -461,9 +461,9 @@ const ManageCourse = () => {
                       ) : (
                         <div className="video-preview">
                           <div className="video-wrapper">
-                            <video 
-                              src={selectedLesson.content} 
-                              controls 
+                            <video
+                              src={selectedLesson.content}
+                              controls
                               className="preview-video"
                             />
                             <div className="video-placeholder">
@@ -473,7 +473,7 @@ const ManageCourse = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="preview-info">
                       <div className="info-row">
                         <span className="info-label">Type:</span>

@@ -117,7 +117,7 @@ const MentorCoursePreview = () => {
 
                   <div className="lesson-info">
                     <h4>{lesson.title}</h4>
-                    <span>
+                    <span className={`lesson-type ${lesson.type}`}>
                       {lesson.type === "video" ? <FaVideo /> : <FaFileAlt />}
                       {lesson.type}
                     </span>
