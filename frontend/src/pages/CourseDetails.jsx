@@ -50,7 +50,7 @@ const CourseDetails = () => {
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [status, setStatus] = useState(null);
   const [showChatModal, setShowChatModal] = useState(false);
-  const [expandedLessons, setExpandedLessons] = useState({});
+
 
   /* -------------------------------- LOAD COURSE -------------------------------- */
   useEffect(() => {
@@ -232,12 +232,7 @@ const CourseDetails = () => {
     }
   };
 
-  const toggleLessonExpansion = (lessonId) => {
-    setExpandedLessons(prev => ({
-      ...prev,
-      [lessonId]: !prev[lessonId]
-    }));
-  };
+
 
   if (loading) {
     return (
@@ -342,7 +337,7 @@ const CourseDetails = () => {
             ) : (
               <button className="enroll-btn continue" onClick={() => {
                 const first = course.lessons.find((l) => l.isFree) || course.lessons[0];
-                if (first) setActiveLesson(first);
+                if (first) navigate(`/course/${id}/lesson/${first._id}`);
               }}>
                 <FaPlay /> Continue Learning
               </button>
@@ -402,7 +397,6 @@ const CourseDetails = () => {
                 {course.lessons.map((lesson, index) => {
                   const canAccess = lesson.isFree || isEnrolled;
                   const isCompleted = completedLessons.includes(lesson._id);
-                  const isExpanded = expandedLessons[lesson._id];
 
                   return (
                     <div
@@ -411,7 +405,7 @@ const CourseDetails = () => {
                     >
                       <div className="lesson-header" onClick={() => {
                         if (!canAccess) return;
-                        toggleLessonExpansion(lesson._id);
+                        navigate(`/course/${id}/lesson/${lesson._id}`);
                       }}>
                         <div className="lesson-status">
                           {isCompleted ? (
@@ -444,7 +438,7 @@ const CourseDetails = () => {
                         <div className="lesson-actions">
                           {canAccess ? (
                             <button className="expand-btn">
-                              {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
+                              <FaArrowRight />
                             </button>
                           ) : (
                             <span className="lock-icon">
@@ -453,44 +447,6 @@ const CourseDetails = () => {
                           )}
                         </div>
                       </div>
-
-                      {isExpanded && canAccess && (
-                        <div className="lesson-content">
-                          {lesson.type === "video" ? (
-                            <div className="video-container">
-                              <video src={lesson.content} controls />
-                              <div className="video-overlay">
-                                <button
-                                  className="mark-complete-btn"
-                                  onClick={() => markLessonComplete(lesson._id)}
-                                  disabled={isCompleted}
-                                >
-                                  {isCompleted ? (
-                                    <><FaCheckCircle /> Completed</>
-                                  ) : (
-                                    <><FaRegCircle /> Mark as Complete</>
-                                  )}
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="text-content">
-                              <div className="content-text">{lesson.content}</div>
-                              <button
-                                className="mark-complete-btn"
-                                onClick={() => markLessonComplete(lesson._id)}
-                                disabled={isCompleted}
-                              >
-                                {isCompleted ? (
-                                  <><FaCheckCircle /> Completed</>
-                                ) : (
-                                  <><FaRegCircle /> Mark as Complete</>
-                                )}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
                   );
                 })}

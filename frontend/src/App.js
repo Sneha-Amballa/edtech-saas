@@ -7,6 +7,7 @@ import Courses from "./pages/Courses.jsx";
 
 import StudentDashboard from "./pages/StudentDashboard.jsx";
 import StudentCourseDetails from "./pages/CourseDetails.jsx";
+import LessonView from "./pages/LessonView.jsx";
 import StudentMessages from "./pages/StudentMessages.jsx";
 import MyCourses from "./pages/MyCourses.jsx";
 import Profile from "./pages/Profile.jsx";
@@ -48,6 +49,15 @@ function App() {
           element={
             <ProtectedRoute role="student">
               <StudentCourseDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/course/:id/lesson/:lessonId"
+          element={
+            <ProtectedRoute role="student">
+              <LessonView />
             </ProtectedRoute>
           }
         />
