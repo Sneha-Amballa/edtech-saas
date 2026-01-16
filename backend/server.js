@@ -116,7 +116,7 @@ io.on("connection", (socket) => {
 });
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
+  .then(async () => {
     console.log("MongoDB connected");
 
     // Seed Admin User
@@ -126,7 +126,8 @@ mongoose.connect(process.env.MONGO_URI)
     const seedAdmin = async () => {
       try {
         const adminEmail = "admin@edtech.com";
-        const adminName = "Admin"; // User requested name "Admin"
+        const adminName = "Admin";
+
         const existingAdmin = await User.findOne({
           $or: [{ email: adminEmail }, { name: adminName }]
         });
@@ -142,16 +143,16 @@ mongoose.connect(process.env.MONGO_URI)
             password: hashedPassword,
             role: "admin"
           });
+
           console.log("Admin User created successfully");
         } else {
-          // Optional: Ensure the existing admin has the correct password/role if you want strictly enforcing
-          // But for now, we just skip if exists.
           console.log("Admin User already exists");
         }
       } catch (err) {
         console.error("Error seeding admin:", err);
       }
     };
+
     await seedAdmin();
 
     server.listen(process.env.PORT || 5000, () => {
@@ -159,5 +160,3 @@ mongoose.connect(process.env.MONGO_URI)
     });
   })
   .catch(err => console.error(err));
-
-
