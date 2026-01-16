@@ -6,7 +6,7 @@ EduMentor is a comprehensive educational SaaS platform connecting students with 
 
 ---
 ## Checkout Project:
-https://edumentor-0qbc.onrender.com/student
+https://edumentor-0qbc.onrender.com/
 
 ## 🎯 What's Been Completed
 
@@ -638,4 +638,5 @@ Built with React, Node.js, MongoDB, and modern web technologies.
 ---
 
 **Ready to launch! 🚀**
+
 
