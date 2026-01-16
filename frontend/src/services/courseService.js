@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:5000/courses";
+const API = "https://edtech-saas.onrender.com/courses";
 
 const getToken = () => localStorage.getItem("token");
 

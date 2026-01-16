@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:5000/auth";
+const API = "https://edtech-saas.onrender.com/auth";
 
 export const registerUser = (data) =>
   axios.post(`${API}/register`, data);

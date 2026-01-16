@@ -22,7 +22,7 @@ const ChatModal = ({ courseId, onClose, mentorName }) => {
   const [attachment, setAttachment] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_BASE_URL = "https://edtech-saas.onrender.com";
 
   // Scroll to bottom when messages change
   const scrollToBottom = () => {

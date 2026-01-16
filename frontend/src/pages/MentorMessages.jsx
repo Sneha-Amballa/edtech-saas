@@ -17,7 +17,7 @@ const MentorMessages = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const socketRef = useRef();
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_BASE_URL = "https://edtech-saas.onrender.com";
 
   useEffect(() => {
     // Socket connection for real-time list updates

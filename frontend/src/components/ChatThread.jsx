@@ -24,7 +24,7 @@ const ChatThread = ({ chatId, onClose, onMessageSent, isStudent = false }) => {
   const [attachment, setAttachment] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_BASE_URL = "https://edtech-saas.onrender.com";
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");

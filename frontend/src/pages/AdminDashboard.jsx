@@ -59,8 +59,8 @@ const AdminDashboard = () => {
         const headers = { Authorization: `Bearer ${token}` };
 
         const [statsRes, analyticsRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/admin/dashboard", { headers }),
-          axios.get("http://localhost:5000/api/admin/analytics", { headers })
+          axios.get("https://edtech-saas.onrender.com/api/admin/dashboard", { headers }),
+          axios.get("https://edtech-saas.onrender.com/api/admin/analytics", { headers })
         ]);
 
         setData(statsRes.data);
@@ -80,7 +80,7 @@ const AdminDashboard = () => {
     if (!window.confirm(`Are you sure you want to delete this ${role}?`)) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/admin/user/${id}`, {
+      await axios.delete(`https://edtech-saas.onrender.com/api/admin/user/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Update state
@@ -98,7 +98,7 @@ const AdminDashboard = () => {
     if (!window.confirm("Are you sure you want to delete this course?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/admin/course/${id}`, {
+      await axios.delete(`https://edtech-saas.onrender.com/api/admin/course/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setData({ ...data, courses: data.courses.filter(c => c._id !== id) });
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
   const handleUpdateRole = async (id, newRole, type) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/admin/user/${id}/role`,
+      await axios.put(`https://edtech-saas.onrender.com/api/admin/user/${id}/role`,
         { role: newRole },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -147,7 +147,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const newStatus = !currentStatus;
-      await axios.put(`http://localhost:5000/api/admin/course/${id}/publish`,
+      await axios.put(`https://edtech-saas.onrender.com/api/admin/course/${id}/publish`,
         { published: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

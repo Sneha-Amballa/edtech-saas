@@ -7,10 +7,10 @@ import { enrollInCourse, getMyCourses, getCounts } from "../services/enrollmentS
 import axios from "axios";
 
 // Icons
-import { 
-  FaGraduationCap, 
-  FaBookOpen, 
-  FaUserGraduate, 
+import {
+  FaGraduationCap,
+  FaBookOpen,
+  FaUserGraduate,
   FaSearch,
   FaFilter,
   FaStar,
@@ -80,7 +80,7 @@ const StudentDashboard = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const API_BASE_URL = "https://edtech-saas.onrender.com";
       const res = await axios.get(`${API_BASE_URL}/api/chat/student/all-chats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -122,7 +122,7 @@ const StudentDashboard = () => {
 
   const sortCourses = (courses) => {
     const sorted = [...courses];
-    
+
     switch (sortOption) {
       case "price-low-high":
         return sorted.sort((a, b) => a.price - b.price);
@@ -145,7 +145,7 @@ const StudentDashboard = () => {
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.description.toLowerCase().includes(searchTerm.toLowerCase());
+      course.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || course.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -195,7 +195,7 @@ const StudentDashboard = () => {
       <div className="floating-element el-2"></div>
 
       {/* Sidebar Navigation */}
-      <motion.aside 
+      <motion.aside
         className="dashboard-sidebar"
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -232,7 +232,7 @@ const StudentDashboard = () => {
             <span>Messages</span>
             {unreadCount > 0 && <span className="badge badge-primary">{unreadCount}</span>}
           </Link>
-          
+
           <Link to="/profile" className="nav-item">
             <FaUserCircle />
             <span>Profile</span>
@@ -250,18 +250,18 @@ const StudentDashboard = () => {
       {/* Main Content */}
       <main className="dashboard-main">
         {/* Top Header */}
-        <motion.header 
-  className="dashboard-header"
-  initial={{ y: -20 }}
-  animate={{ y: 0 }}
-  transition={{ duration: 0.5, delay: 0.2 }}
->
+        <motion.header
+          className="dashboard-header"
+          initial={{ y: -20 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
 
           <div className="header-left">
             <h1>Welcome back, {user?.name?.split(' ')[0] || 'Student'}!</h1>
             <p>Continue your learning journey</p>
           </div>
-          
+
           <div className="header-right">
             <div className="header-search">
               <FaSearch />
@@ -272,7 +272,7 @@ const StudentDashboard = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            
+
             <div className="header-actions">
               <Link to="/student/notifications" className="notification-btn">
                 <FaBell />
@@ -292,7 +292,7 @@ const StudentDashboard = () => {
         </motion.header>
 
         {/* Stats Overview */}
-        <motion.section 
+        <motion.section
           className="stats-overview"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -324,10 +324,10 @@ const StudentDashboard = () => {
               <div className="progress-ring">
                 <svg width="60" height="60">
                   <circle cx="30" cy="30" r="25" className="progress-bg"></circle>
-                  <circle 
-                    cx="30" 
-                    cy="30" 
-                    r="25" 
+                  <circle
+                    cx="30"
+                    cy="30"
+                    r="25"
                     className="progress-circle"
                     style={{
                       strokeDasharray: '157',
@@ -348,7 +348,7 @@ const StudentDashboard = () => {
                 <p>In Progress</p>
               </div>
               <div className="progress-bar">
-                <div 
+                <div
                   className="progress-fill"
                   style={{ width: `${(inProgressCount / Math.max(enrolledCount, 1)) * 100}%` }}
                 ></div>
@@ -372,7 +372,7 @@ const StudentDashboard = () => {
         </motion.section>
 
         {/* Quick Actions & Categories */}
-        <motion.section 
+        <motion.section
           className="quick-actions"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -386,176 +386,176 @@ const StudentDashboard = () => {
 
         {/* Courses Section */}
         <motion.section
-  className="courses-section"
-  initial={{ y: 20, opacity: 0 }}
-  animate={{ y: 0, opacity: 1 }}
-  transition={{ duration: 0.5, delay: 0.5 }}
->
-  <div className="section-header">
-    <div className="section-title-group">
-      <h2>Available Courses</h2>
-      <span className="courses-count">
-        {sortedAndFilteredCourses.length} courses available
-      </span>
-    </div>
-
-    <div className="section-controls">
-      <div className="view-toggle-group">
-        <button
-          className={`view-toggle ${viewMode === "grid" ? "active" : ""}`}
-          onClick={() => setViewMode("grid")}
+          className="courses-section"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <FiGrid /> Grid
-        </button>
-        <button
-          className={`view-toggle ${viewMode === "list" ? "active" : ""}`}
-          onClick={() => setViewMode("list")}
-        >
-          <FiList /> List
-        </button>
-      </div>
+          <div className="section-header">
+            <div className="section-title-group">
+              <h2>Available Courses</h2>
+              <span className="courses-count">
+                {sortedAndFilteredCourses.length} courses available
+              </span>
+            </div>
 
-      <div className="filter-controls">
-        <div className="filter-group">
-          <FaFilter />
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-          >
-            <option value="recommended">Recommended</option>
-            <option value="newest">Newest First</option>
-            <option value="popular">Most Popular</option>
-            <option value="rating-highest">Highest Rated</option>
-            <option value="price-low-high">Price: Low to High</option>
-            <option value="price-high-low">Price: High to Low</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* CONTENT */}
-  {loading ? (
-    <div className="loading-state">
-      <div className="loading-spinner"></div>
-      <p>Loading courses...</p>
-    </div>
-  ) : sortedAndFilteredCourses.length === 0 ? (
-    <div className="empty-state">
-      <div className="empty-icon">
-        <FaBookOpen />
-      </div>
-      <h3>No courses found</h3>
-      <p>Try adjusting your search or filter criteria</p>
-      <button
-        className="clear-filters-btn"
-        onClick={() => {
-          setSearchTerm("");
-          setSelectedCategory("all");
-        }}
-      >
-        Clear All Filters
-      </button>
-    </div>
-  ) : (
-    <motion.div
-      className={`courses-container ${viewMode}`}
-      layout
-    >
-      {sortedAndFilteredCourses.map((course) => (
-        <motion.div
-          key={course._id}
-          className={`course-card ${viewMode}`}
-          layout
-          whileHover={{ y: -5 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        >
-          {/* IMAGE */}
-          <div className="course-image">
-            {course.imageUrl ? (
-              <img src={course.imageUrl} alt={course.title} />
-            ) : (
-              <div className="course-image-placeholder">
-                <FaBookOpen />
+            <div className="section-controls">
+              <div className="view-toggle-group">
+                <button
+                  className={`view-toggle ${viewMode === "grid" ? "active" : ""}`}
+                  onClick={() => setViewMode("grid")}
+                >
+                  <FiGrid /> Grid
+                </button>
+                <button
+                  className={`view-toggle ${viewMode === "list" ? "active" : ""}`}
+                  onClick={() => setViewMode("list")}
+                >
+                  <FiList /> List
+                </button>
               </div>
-            )}
+
+              <div className="filter-controls">
+                <div className="filter-group">
+                  <FaFilter />
+                  <select
+                    value={sortOption}
+                    onChange={(e) => setSortOption(e.target.value)}
+                  >
+                    <option value="recommended">Recommended</option>
+                    <option value="newest">Newest First</option>
+                    <option value="popular">Most Popular</option>
+                    <option value="rating-highest">Highest Rated</option>
+                    <option value="price-low-high">Price: Low to High</option>
+                    <option value="price-high-low">Price: High to Low</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* CONTENT */}
-          <div className="course-content">
-            <div className="course-header">
-              <div className="course-category">
-                {course.category || "General"}
-              </div>
+          {loading ? (
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Loading courses...</p>
             </div>
-
-            <h3 className="course-title">{course.title}</h3>
-
-            <p className="course-instructor">
-              By {course.instructor?.name || "Expert Instructor"}
-            </p>
-
-            <p className="course-description">
-              {course.description.length > 100
-                ? `${course.description.substring(0, 100)}...`
-                : course.description}
-            </p>
-
-            <div className="course-meta">
-              <div className="meta-item">
-                <FaClock />
-                <span>{course.duration || "Self-paced"}</span>
+          ) : sortedAndFilteredCourses.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">
+                <FaBookOpen />
               </div>
-              <div className="meta-item">
-                <FaUsers />
-                <span>{course.enrolledCount || 0} students</span>
-              </div>
-              <div className="meta-item">
-                <FiTrendingUp />
-                <span>{course.level || "All Levels"}</span>
-              </div>
+              <h3>No courses found</h3>
+              <p>Try adjusting your search or filter criteria</p>
+              <button
+                className="clear-filters-btn"
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("all");
+                }}
+              >
+                Clear All Filters
+              </button>
             </div>
-
-            <div className="course-footer">
-              <div className="course-pricing">
-                <span className="current-price">₹{course.price}</span>
-                {course.originalPrice && (
-                  <span className="original-price">
-                    ₹{course.originalPrice}
-                  </span>
-                )}
-              </div>
-
-              <div className="course-actions">
-                {enrolledCourseIds.includes(course._id) ? (
-                  <button
-                    className="btn-continue"
-                    onClick={() => navigate(`/course/${course._id}`)}
-                  >
-                    <FaPlayCircle /> Continue
-                  </button>
-                ) : (
-                  <button
-                    className="btn-enroll"
-                    onClick={() => handleEnroll(course._id)}
-                  >
-                    Enroll Now <FaChevronRight />
-                  </button>
-                )}
-                <Link
-                  to={`/course/${course._id}`}
-                  className="btn-outline"
+          ) : (
+            <motion.div
+              className={`courses-container ${viewMode}`}
+              layout
+            >
+              {sortedAndFilteredCourses.map((course) => (
+                <motion.div
+                  key={course._id}
+                  className={`course-card ${viewMode}`}
+                  layout
+                  whileHover={{ y: -5 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
                 >
-                  Preview
-                </Link>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      ))}
-    </motion.div>
-  )}
-</motion.section>
+                  {/* IMAGE */}
+                  <div className="course-image">
+                    {course.imageUrl ? (
+                      <img src={course.imageUrl} alt={course.title} />
+                    ) : (
+                      <div className="course-image-placeholder">
+                        <FaBookOpen />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CONTENT */}
+                  <div className="course-content">
+                    <div className="course-header">
+                      <div className="course-category">
+                        {course.category || "General"}
+                      </div>
+                    </div>
+
+                    <h3 className="course-title">{course.title}</h3>
+
+                    <p className="course-instructor">
+                      By {course.instructor?.name || "Expert Instructor"}
+                    </p>
+
+                    <p className="course-description">
+                      {course.description.length > 100
+                        ? `${course.description.substring(0, 100)}...`
+                        : course.description}
+                    </p>
+
+                    <div className="course-meta">
+                      <div className="meta-item">
+                        <FaClock />
+                        <span>{course.duration || "Self-paced"}</span>
+                      </div>
+                      <div className="meta-item">
+                        <FaUsers />
+                        <span>{course.enrolledCount || 0} students</span>
+                      </div>
+                      <div className="meta-item">
+                        <FiTrendingUp />
+                        <span>{course.level || "All Levels"}</span>
+                      </div>
+                    </div>
+
+                    <div className="course-footer">
+                      <div className="course-pricing">
+                        <span className="current-price">₹{course.price}</span>
+                        {course.originalPrice && (
+                          <span className="original-price">
+                            ₹{course.originalPrice}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="course-actions">
+                        {enrolledCourseIds.includes(course._id) ? (
+                          <button
+                            className="btn-continue"
+                            onClick={() => navigate(`/course/${course._id}`)}
+                          >
+                            <FaPlayCircle /> Continue
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-enroll"
+                            onClick={() => handleEnroll(course._id)}
+                          >
+                            Enroll Now <FaChevronRight />
+                          </button>
+                        )}
+                        <Link
+                          to={`/course/${course._id}`}
+                          className="btn-outline"
+                        >
+                          Preview
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </motion.section>
 
 
         {/* Footer */}

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:5000/api/profile";
+const API = "https://edtech-saas.onrender.com/api/profile";
 
 const getAuthConfig = () => {
   const token = localStorage.getItem("token");
