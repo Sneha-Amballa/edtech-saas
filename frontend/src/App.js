@@ -1,25 +1,26 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Courses from "./pages/Courses";
+import Home from "./pages/Home.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Courses from "./pages/Courses.jsx";
 
-import StudentDashboard from "./pages/StudentDashboard";
-import StudentCourseDetails from "./pages/CourseDetails";
-import StudentMessages from "./pages/StudentMessages";
-import MyCourses from "./pages/MyCourses";
-import Profile from "./pages/Profile";
-import Certificate from "./pages/Certificate";
+import StudentDashboard from "./pages/StudentDashboard.jsx";
+import StudentCourseDetails from "./pages/CourseDetails.jsx";
+import StudentMessages from "./pages/StudentMessages.jsx";
+import MyCourses from "./pages/MyCourses.jsx";
+import Profile from "./pages/Profile.jsx";
+import Certificate from "./pages/Certificate.jsx";
 
-import MentorDashboard from "./pages/MentorDashboard";
-import CreateCourse from "./pages/CreateCourse";
-import ManageCourse from "./pages/ManageCourse";
-import MentorCoursePreview from "./pages/MentorCoursePreview";
-import MentorMessages from "./pages/MentorMessages";
-import AdminDashboard from "./pages/AdminDashboard";
+import MentorDashboard from "./pages/MentorDashboard.jsx";
+import CreateCourse from "./pages/CreateCourse.jsx";
+import ManageCourse from "./pages/ManageCourse.jsx";
+import MentorCoursePreview from "./pages/MentorCoursePreview.jsx";
+import MentorMessages from "./pages/MentorMessages.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
+
 
 function App() {
   return (
