@@ -10,18 +10,21 @@ const mentorRoutes = require("./src/routes/mentorRoutes");
 
 const app = express();
 
-/* ✅ PRODUCTION CORS CONFIG */
+/* ✅ FINAL CORRECT CORS CONFIG */
 app.use(
   cors({
     origin: [
-      "http://localhost:3000",               // local dev
-      "https://edtech-saas-frontend.onrender.com" // 🔴 REPLACE with your actual frontend URL
+      "http://localhost:3000",
+      "https://edumentor-0qbc.onrender.com" // ✅ YOUR REAL FRONTEND
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
+
+/* ✅ IMPORTANT: allow preflight */
+app.options("*", cors());
 
 app.use(express.json());
 
