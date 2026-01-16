@@ -25,7 +25,8 @@ import {
   Tooltip,
   Legend,
   ArcElement,
-  DoughnutController
+  DoughnutController,
+  Filler
 } from 'chart.js';
 import { Line, Pie, Bar, Doughnut } from 'react-chartjs-2';
 
@@ -39,7 +40,8 @@ ChartJS.register(
   Tooltip,
   Legend,
   ArcElement,
-  DoughnutController
+  DoughnutController,
+  Filler
 );
 
 const AdminDashboard = () => {
