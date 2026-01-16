@@ -15,7 +15,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://edumentor-0qbc.onrender.com" // ✅ YOUR REAL FRONTEND
+      "https://edtech-saas.onrender.com",
+      "https://edumentor-0qbc.onrender.com"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -24,7 +25,7 @@ app.use(
 );
 
 /* ✅ IMPORTANT: allow preflight */
-app.options("*", cors());
+app.options(/.*/, cors());
 
 app.use(express.json());
 
